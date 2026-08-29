@@ -21,15 +21,6 @@ type Pedido = {
 };
 
 export default function Administracao() {
-  useEffect(() => {
-    async function verificarSessao() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.replace("/administracao/login");
-      }
-    }
-    verificarSessao();
-  }, []);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [carregando, setCarregando] = useState(true);
 
@@ -100,6 +91,26 @@ export default function Administracao() {
       return;
     }
 
+    if (
+      pedido.tipo === "venda" &&
+      Number(pedido.ervas_quantidade) > 0
+    ) {
+      const { error: vendaError } = await supabase
+        .from("vendas")
+        .insert({
+          jogador_id: pedido.jogador_id,
+          pedido_id: pedido.id,
+          quantidade_ervas: Number(pedido.ervas_quantidade),
+          valor: Number(pedido.valor_total),
+        });
+
+      if (vendaError) {
+        console.error(vendaError);
+        alert(
+          "O pedido foi finalizado, mas houve erro ao registrar a venda."
+        );
+      }
+    }
 
     await carregarPedidos();
   }

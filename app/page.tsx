@@ -39,11 +39,11 @@ export default function Home(){
      fertilizante_quantidade: type === "compra" ? fert : 0,
      valor_total: type === "venda" ? herbValue : buyValue,
      status: "processando"
-   }).select("*").single();
-   if (orderError) return setNotice("Não foi possível criar o pedido.");
-   const localOrder = { id: order.id, gamertag: gamertag.trim(), type, herbs: type === "venda" ? herbs : 0, seeds: type === "compra" ? seeds : 0, fert: type === "compra" ? fert : 0, total: type === "venda" ? herbValue : buyValue, status: "processando" };
+   });
+   if (orderError) return setNotice(`Erro Supabase: ${orderError.message}`);
+   const localOrder = { id: Date.now(), gamertag: gamertag.trim(), type, herbs: type === "venda" ? herbs : 0, seeds: type === "compra" ? seeds : 0, fert: type === "compra" ? fert : 0, total: type === "venda" ? herbValue : buyValue, status: "processando" };
    setOrders(prev => [localOrder, ...prev]);
-   setNotice(`Pedido #${order.id} enviado com sucesso.`); setMode("home");
+   setNotice(`Pedido #${Date.now()} enviado com sucesso.`); setMode("home");
  }
  return <main>
   <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO <i>Z</i></h1><p>O CAOS MOVE. A ESTRATÉGIA VENCE.</p><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & SUPRIMENTOS</strong><em>NEGOCIE. PLANTE. FORTALEÇA O SERVIDOR.</em></div></header>
@@ -83,7 +83,7 @@ AGENDAR VENDA
 </Panel>}
 
 {mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><label>Gamertag<input value={gamertag} onChange={e=>setGamertag(e.target.value)} placeholder="Nome no jogo"/></label><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><button onClick={()=>setSeeds(Math.max(0,seeds-1))}>−</button><b>{seeds}</b><button onClick={()=>setSeeds(seeds+1)}>+</button></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><button onClick={()=>setFert(Math.max(0,fert-1))}>−</button><b>{fert}</b><button onClick={()=>setFert(fert+1)}>+</button></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
-  </div><footer>DISTRITO ZERO • HOLOCAUSTO Z<br/><small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
+  </div><footer><a href="/administracao/login" style={{fontSize:"14px",opacity:0.35,textDecoration:"none"}}>🔒</a>DISTRITO ZERO • HOLOCAUSTO Z<br/><small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
  </main>
 }
 function Card(p:any){return <button className="card" onClick={p.onClick}><span>{p.icon}</span><h3>{p.title}</h3><p>{p.text}</p><b>ACESSAR →</b></button>}

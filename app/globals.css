@@ -1904,3 +1904,37 @@ body {
   }
 }
 
+
+/* ===== BOTÃO EXCLUIR PEDIDO ===== */
+
+.delete-order {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 10px !important;
+  font-size: 20px !important;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.delete-order:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 699px) {
+  .admin-order > div:last-child {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .delete-order {
+    align-self: flex-end;
+  }
+}
+

@@ -21,6 +21,7 @@ type Pedido = {
 };
 
 export default function Administracao() {
+
   useEffect(() => {
     async function verificarSessao() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -103,6 +104,26 @@ export default function Administracao() {
 
     await carregarPedidos();
   }
+
+  async function excluirPedido(pedido: Pedido) {
+    const confirmar = window.confirm(`Excluir o pedido #${pedido.id}? Esta ação não pode ser desfeita.`);
+
+    if (!confirmar) return;
+
+    const { error } = await supabase
+      .from("pedidos")
+      .delete()
+      .eq("id", pedido.id);
+
+    if (error) {
+      alert("Erro ao excluir o pedido.");
+      console.error(error);
+      return;
+    }
+
+    await carregarPedidos();
+  }
+
 
   useEffect(() => {
     carregarPedidos();
@@ -202,7 +223,6 @@ export default function Administracao() {
                       pedido.fertilizante_quantidade
                     )} fertilizantes`}
               </small>
-
             </div>
 
             <div>
@@ -224,6 +244,16 @@ export default function Administracao() {
                 {pedido.status === "realizado"
                   ? "✓ Realizado"
                   : "Marcar realizado"}
+              </button>
+
+              <button
+                type="button"
+                className="delete-order"
+                onClick={() => excluirPedido(pedido)}
+                title="Excluir pedido"
+                aria-label="Excluir pedido"
+              >
+                🗑️
               </button>
 
             </div>

@@ -1632,3 +1632,82 @@ body {
   color: #ffffff;
 }
 
+
+/* ORGANIZAÇÃO DOS PEDIDOS - PAINEL ADMIN */
+.admin-order {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(150, 190, 120, 0.25);
+  border-radius: 12px;
+  background: rgba(10, 18, 10, 0.75);
+  box-sizing: border-box;
+}
+
+.admin-order > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-order > div:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.admin-order b {
+  font-size: 18px;
+}
+
+.admin-order span {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.admin-order small {
+  display: block;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.admin-order strong {
+  white-space: nowrap;
+  font-size: 17px;
+}
+
+.admin-order button {
+  white-space: nowrap;
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* CELULAR */
+@media (max-width: 600px) {
+  .admin-order {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .admin-order > div:last-child {
+    align-items: stretch;
+  }
+
+  .admin-order strong {
+    text-align: left;
+  }
+
+  .admin-order button {
+    width: 100%;
+  }
+}

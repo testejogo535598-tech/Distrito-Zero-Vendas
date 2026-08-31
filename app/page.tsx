@@ -81,6 +81,7 @@ export default function Home(){
 
 </nav>
   <div className="wrap">{notice&&<div className="notice">{notice}</div>}
+   {mode!=="home"&&<button className="backHome" onClick={()=>{setMode("home");setNotice("")}}>← INÍCIO</button>}
    {mode==="home"&&<>
 <section className="guide">
   <div className="guideIntro">

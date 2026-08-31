@@ -1608,3 +1608,27 @@ body {
   color: #B0B8A8 !important;
   text-shadow: 1px 1px 3px #000 !important;
 }
+
+.backHome {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 4px;
+  padding: 8px 14px;
+  border: 1px solid rgba(150, 180, 120, 0.35);
+  border-radius: 6px;
+  background: rgba(10, 18, 14, 0.75);
+  color: #c8d8c0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.backHome:hover {
+  background: rgba(100, 130, 80, 0.18);
+  border-color: rgba(150, 180, 120, 0.65);
+  color: #ffffff;
+}
+

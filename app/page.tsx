@@ -13,7 +13,7 @@ export default function Home(){
  const buyValue=seeds*SEED_PACK_PRICE+fert*FERT_PRICE;
  const [orders,setOrders]=useState<any[]>([]);
   const [ranking,setRanking]=useState<any[]>([]);
-  useEffect(()=>{(async()=>{const {data}=await supabase.rpc("ranking_semanal");if(data)setRanking(data);})();},[]);
+  useEffect(()=>{(async()=>{const {data}=await supabase.rpc("ranking_vendas");if(data)setRanking(data);})();},[]);
 
  async function submit(type:"venda"|"compra"){
    if(!gamertag.trim()) return setNotice("Informe sua Gamertag.");
@@ -163,7 +163,7 @@ export default function Home(){
   </div>
 </section>
 </>}
-        {mode==="ranking"&&<Panel title="🏆 TOP 10 DA SEMANA"><p className="muted">Ranking atualizado automaticamente pelas vendas realizadas durante a semana.</p>{Array.from({length:10},(_,i)=>ranking[i]||{gamertag:"VAGO",quantidade_ervas:0}).map((x,i)=><div className="rank" key={i}><b>{i+1}º</b><span>{x.gamertag}</span>{x.quantidade_ervas>0&&<strong>{Number(x.quantidade_ervas).toLocaleString("pt-BR")} ervas</strong>}</div>)}</Panel>}
+        {mode==="ranking"&&<Panel title="🏆 TOP 10 DE VENDEDORES"><p className="muted">Ranking acumulado desde o inicio. A classificacao e atualizada automaticamente conforme as vendas.</p>{Array.from({length:10},(_,i)=>ranking[i]||{gamertag:"VAGO",quantidade_ervas:0,valor_arrecadado:0}).map((x,i)=><div className="rank" key={i}><b>{i+1}º</b><span>{x.gamertag}</span>{x.quantidade_ervas>0&&<strong>{Number(x.quantidade_ervas).toLocaleString("pt-BR")} ervas • {Number(x.valor_arrecadado).toLocaleString("pt-BR")} DZCOINS</strong>}</div>)}</Panel>}
    {mode==="sell"&&<Panel title="🌿 VENDER ERVAS">
 <label>
 Gametag

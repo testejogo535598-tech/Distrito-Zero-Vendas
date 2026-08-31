@@ -121,7 +121,7 @@ export default function Administracao() {
   return (
     <main className="page">
 
-      <section className="hero">
+      <section className="hero admin-hero">
         <p className="eyebrow">HOLOCAUSTO Z</p>
 
         <h1>DISTRITO ZERO</h1>

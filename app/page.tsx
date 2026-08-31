@@ -46,7 +46,7 @@ export default function Home(){
    setNotice(`Pedido #${Date.now()} enviado com sucesso.`); setMode("home");
  }
  return <main>
-  <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO</h1><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>A ÚLTIMA ESPERANÇA AINDA BROTA.</em><div className="hero-admin"><button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Admin</button></div></div></header>
+  <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO</h1><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>A ÚLTIMA ESPERANÇA AINDA BROTA.</em><div className="hero-admin"><button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Mercador</button></div></div></header>
   <nav className="mainActions">
 
   <button className="actionCard actionHerbs" onClick={() => {setMode("sell");setNotice("")}}>

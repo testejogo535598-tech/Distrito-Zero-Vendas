@@ -2305,3 +2305,26 @@ body {
 
 }
 
+
+/* Remove o card da frase principal do servidor */
+.heroText em{
+  display:block;
+  margin-top:24px;
+  padding:0;
+  background:none;
+  border:0;
+  color:#d9ded6;
+  font-style:normal;
+  box-shadow:none;
+}
+
+/* Celular */
+@media(max-width:760px){
+  .heroText em{
+    padding:0;
+    background:none;
+    border:0;
+    font-size:9px;
+  }
+}
+

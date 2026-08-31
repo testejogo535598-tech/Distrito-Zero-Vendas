@@ -1,107 +1,1610 @@
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#070d06;color:#eee;font-family:Arial,Helvetica,sans-serif}.hero{min-height:470px;position:relative;background:radial-gradient(circle at 75% 25%,#6b803d,#25361c 34%,#080d07 75%);overflow:hidden}.hero:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,transparent 0 12px,rgba(255,255,255,.018) 12px 14px)}.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.86),rgba(0,0,0,.22) 70%,rgba(0,0,0,.65))}.heroText{position:relative;z-index:1;max-width:1100px;margin:auto;padding:55px 22px}.heroText small{font-weight:900;letter-spacing:6px}.heroText h1{font-size:clamp(43px,8vw,90px);margin:8px 0;text-shadow:5px 5px #000}.heroText i,.heroText b,.heroText strong,.heroText em{color:#9fca2a}.heroText p{color:#b1cf44;font-weight:900}.logo{font-size:clamp(52px,10vw,110px);font-weight:1000;margin-top:55px;line-height:.85;text-shadow:5px 5px #000}.heroText>strong{display:block;font-size:clamp(18px,3vw,34px);letter-spacing:4px}.heroText em{display:inline-block;margin-top:18px;background:#121a0d;border:1px solid #617a20;padding:12px;font-style:normal;font-weight:900}nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:16px;background:#0d150a;border-block:1px solid #50651b}nav button{background:#131d0e;color:#eee;border:1px solid #536c1d;padding:12px 16px;font-weight:900;cursor:pointer}nav button:hover,.action:hover{background:#a1c62d;color:#081006}.wrap{max-width:1050px;margin:auto;padding:35px 16px;min-height:520px}.intro{text-align:center}.intro h2,.panel h2{color:#a1c62d;letter-spacing:2px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:30px 0}.card{background:linear-gradient(145deg,#121b0e,#0b1209);border:1px solid #4f681b;color:#eee;text-align:left;padding:24px;cursor:pointer;min-height:190px}.card>span{font-size:40px}.card h3{color:#a1c62d;font-size:23px}.card p{color:#aaa;line-height:1.45}.card b{color:#a1c62d}.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:30px}.prices div{padding:22px;text-align:center;background:#11190d;border:1px solid #435b18}.prices b,.prices strong{display:block}.prices b{color:#a1c62d}.prices span{display:block;margin:8px 0;color:#aaa}.prices strong{font-size:24px}.panel{max-width:720px;margin:20px auto;background:#10180d;border:1px solid #50691b;padding:28px;box-shadow:0 12px 35px #0008}.panel label{display:block;margin:18px 0;color:#aaa;font-weight:800}.panel input{display:block;width:100%;margin-top:8px;padding:14px;background:#080d07;color:#fff;border:1px solid #4e671b;font-size:16px}.total{display:flex;justify-content:space-between;align-items:center;background:#0a1008;border:1px solid #354815;padding:18px;margin:20px 0}.total strong{color:#a1c62d;font-size:23px}.action{width:100%;background:#789d1d;border:0;padding:15px;font-weight:1000;cursor:pointer}.product{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:18px 0;border-bottom:1px solid #283714}.product small{display:block;color:#888;margin-top:6px}.product button{background:#293b12;color:#fff;border:1px solid #526b1c;padding:8px 13px;font-size:18px}.product b{padding:0 15px}.notice{max-width:720px;margin:0 auto 15px;padding:14px;background:#18240e;border:1px solid #718d22;color:#c3e15b}.order,.rank{display:grid;grid-template-columns:1fr;gap:7px;padding:16px 0;border-bottom:1px solid #293817}.order strong,.rank strong{color:#a1c62d}.order em{color:#d5a63a;font-style:normal;font-weight:900}.rank{grid-template-columns:60px 1fr auto}.rank b{color:#a1c62d}.muted{color:#888}footer{text-align:center;padding:35px;background:#040804;border-top:1px solid #354714;color:#a1c62d;font-weight:900}footer small{color:#666}@media(max-width:760px){.cards,.prices{grid-template-columns:1fr}.hero{min-height:440px}.logo{margin-top:38px}.rank{grid-template-columns:45px 1fr}.rank strong{grid-column:2}.nav button{flex:1 1 44%;font-size:12px}}
-.admin-order {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 18px;
-  margin-bottom: 14px;
-  border: 1px solid #506d16;
-  border-radius: 10px;
-  background: rgba(15, 25, 12, 0.85);
+*{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
 }
 
-.admin-order > div:first-child {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+body{
+  margin:0;
+  background:#050706;
+  color:#e8ebe5;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
-.admin-order > div:first-child b {
-  font-size: 22px;
-  color: #a6d52b;
+/* =========================================================
+   DISTRITO ZERO — NOVA HOME
+   ========================================================= */
+
+main{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(105,130,78,.12),transparent 30%),
+    linear-gradient(180deg,#050706 0%,#0a0e0a 48%,#030403 100%);
 }
 
-.admin-order > div:first-child span {
-  font-size: 19px;
-  font-weight: 700;
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero{
+  min-height:560px;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+
+  background:
+    radial-gradient(circle at 75% 30%,rgba(101,133,69,.35),transparent 22%),
+    radial-gradient(circle at 25% 75%,rgba(126,53,35,.13),transparent 25%),
+    linear-gradient(120deg,#050705 0%,#111710 38%,#20291c 65%,#060806 100%);
+
+  border-bottom:1px solid rgba(153,169,129,.22);
+
+  box-shadow:
+    inset 0 -140px 130px rgba(0,0,0,.8),
+    0 20px 55px rgba(0,0,0,.65);
 }
 
-.admin-order > div:first-child small {
-  font-size: 16px;
-  color: #ddd;
+/* textura */
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+
+  background:
+    repeating-linear-gradient(
+      115deg,
+      transparent 0 24px,
+      rgba(255,255,255,.014) 25px,
+      transparent 27px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.8),
+      transparent 45%,
+      rgba(0,0,0,.55)
+    );
+
+  opacity:.8;
 }
 
-.admin-order > div:last-child {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+/* luz ambiental */
+.hero:after{
+  content:"";
+  position:absolute;
+  width:500px;
+  height:500px;
+  right:-180px;
+  bottom:-260px;
+  border-radius:50%;
+
+  background:rgba(93,122,60,.16);
+  filter:blur(60px);
+  pointer-events:none;
 }
 
-.admin-order > div:last-child strong {
-  font-size: 18px;
-  color: #a6d52b;
+.shade{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.88) 0%,
+      rgba(0,0,0,.48) 48%,
+      rgba(0,0,0,.68) 100%
+    );
 }
 
-.admin-order button {
-  padding: 10px 16px;
-  border: 1px solid #7fa51c;
-  border-radius: 7px;
-  background: #182510;
-  color: white;
-  font-weight: 700;
+.heroText{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:1150px;
+  margin:auto;
+  padding:65px 25px 55px;
 }
 
-.admin-order button:disabled {
-  opacity: 0.8;
+/* SERVIDOR */
+
+.heroText small{
+  display:block;
+  margin-bottom:10px;
+
+  font-family:"Arial Narrow",Arial,sans-serif;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:7px;
+
+  color:#a8aea4;
 }
 
+/* HOLOCAUSTO Z */
 
-.admin-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
+.heroText h1{
+  margin:0;
+
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  font-size:clamp(44px,8vw,92px);
+  line-height:.88;
+  letter-spacing:4px;
+
+  color:#dce0da;
+
+  text-shadow:
+    3px 4px 0 #000,
+    0 10px 30px rgba(0,0,0,.8);
 }
 
-.admin-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 18px;
-  border: 1px solid #506d16;
-  border-radius: 12px;
-  background: rgba(15, 25, 12, 0.85);
+.heroText h1 i{
+  color:#71845b;
+  font-style:normal;
 }
 
-.admin-stat > span {
-  font-size: 28px;
+/* slogan */
+
+.heroText p{
+  margin:16px 0 0;
+
+  color:#9ca59a;
+  font-size:clamp(12px,2vw,17px);
+  font-weight:900;
+  letter-spacing:3px;
 }
 
-.admin-stat > small {
-  font-size: 13px;
-  color: #aaa;
-  font-weight: 700;
+/* =========================================================
+   LOGO DISTRITO ZERO
+   ========================================================= */
+
+.logo{
+  position:relative;
+  display:inline-block;
+
+  margin-top:58px;
+
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  font-size:clamp(62px,12vw,135px);
+  line-height:.78;
+  letter-spacing:5px;
+
+  color:#f1f3ee;
+
+  text-transform:uppercase;
+
+  text-shadow:
+    0 2px 0 #20231f,
+    5px 7px 0 #000,
+    0 18px 40px rgba(0,0,0,.8);
 }
 
-.admin-stat > strong {
-  font-size: 28px;
-  color: #a6d52b;
+/* pequena linha industrial */
+.logo:after{
+  content:"";
+  display:block;
+  height:4px;
+  width:72%;
+  margin-top:14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #687b52,
+      #9aa989,
+      transparent
+    );
+
+  opacity:.8;
 }
 
-@media (max-width: 600px) {
-  .admin-stats {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.logo b{
+  color:#75895c;
+}
+
+/* subtítulo */
+
+.heroText>strong{
+  display:block;
+  margin-top:20px;
+
+  color:#bfc5bd;
+
+  font-family:"Arial Narrow",Arial,sans-serif;
+  font-size:clamp(15px,2.5vw,27px);
+  letter-spacing:5px;
+}
+
+/* placa */
+
+.heroText em{
+  display:inline-block;
+  margin-top:24px;
+  padding:12px 17px;
+
+  color:#d9ded6;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(38,43,35,.94),
+      rgba(11,14,10,.97)
+    );
+
+  border:1px solid rgba(133,148,116,.35);
+  border-left:4px solid #71865a;
+
+  font-style:normal;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:1.7px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.55),
+    inset 0 1px rgba(255,255,255,.04);
+}
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+
+.hero-admin{
+  display:flex;
+  justify-content:center;
+  margin-top:9px;
+}
+
+.admin-link{
+  margin:0!important;
+  padding:2px 5px!important;
+
+  border:0!important;
+  background:transparent!important;
+
+  color:#70786c!important;
+  font-size:9px!important;
+  font-weight:600!important;
+  letter-spacing:.5px;
+
+  opacity:.5;
+  box-shadow:none!important;
+}
+
+.admin-link:hover{
+  color:#b4c49e!important;
+  opacity:1;
+  background:transparent!important;
+}
+
+/* =========================================================
+   NAVEGAÇÃO
+   ========================================================= */
+
+nav{
+  position:relative;
+  z-index:5;
+
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+
+  padding:17px 15px;
+
+  background:
+    linear-gradient(180deg,#11150f,#070907);
+
+  border-top:1px solid rgba(129,147,108,.22);
+  border-bottom:1px solid rgba(129,147,108,.22);
+
+  box-shadow:0 10px 30px rgba(0,0,0,.55);
+}
+
+nav button{
+  padding:13px 20px;
+
+  color:#dfe4dc;
+  background:
+    linear-gradient(145deg,#171d14,#0b0f0a);
+
+  border:1px solid rgba(123,143,98,.38);
+
+  font-weight:900;
+  letter-spacing:.5px;
+
+  cursor:pointer;
+
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    background .2s ease;
+}
+
+nav button:hover{
+  transform:translateY(-2px);
+
+  border-color:#849d68;
+
+  background:
+    linear-gradient(145deg,#202b18,#0c110b);
+}
+
+/* =========================================================
+   ÁREA PRINCIPAL
+   ========================================================= */
+
+.wrap{
+  max-width:1120px;
+  margin:auto;
+  padding:55px 20px 75px;
+  min-height:650px;
+}
+
+.notice{
+  max-width:760px;
+  margin:0 auto 25px;
+
+  padding:15px 18px;
+
+  background:#11180e;
+  border:1px solid #65794c;
+
+  color:#c5d1b8;
+}
+
+/* =========================================================
+   GUIA
+   ========================================================= */
+
+.guideIntro{
+  text-align:center;
+  margin-bottom:38px;
+}
+
+.guideIntro h2{
+  margin:0 0 12px;
+
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  font-size:clamp(28px,5vw,48px);
+  letter-spacing:2px;
+
+  color:#dce2d8;
+}
+
+.guideIntro p{
+  max-width:720px;
+  margin:auto;
+
+  color:#899287;
+  line-height:1.6;
+}
+
+.guideCard{
+  position:relative;
+
+  margin:25px 0;
+  padding:30px;
+
+  background:
+    linear-gradient(145deg,#151b13,#080b08);
+
+  border:1px solid rgba(116,135,94,.3);
+
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.45),
+    inset 0 1px rgba(255,255,255,.025);
+
+  overflow:hidden;
+}
+
+.guideCard:before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #71865b,
+      transparent 70%
+    );
+}
+
+.guideCard h3{
+  margin-top:0;
+
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  letter-spacing:2px;
+
+  color:#bdc9b5;
+}
+
+.guideCard p{
+  color:#a2aaa0;
+  line-height:1.65;
+}
+
+/* =========================================================
+   CICLO DE PLANTAÇÃO
+   ========================================================= */
+
+.plantCycle{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+
+  margin:25px 0;
+  padding:25px;
+
+  background:
+    linear-gradient(145deg,#11180d,#070a06);
+
+  border:1px solid rgba(112,133,87,.25);
+}
+
+.plantCycle span{
+  padding:10px 12px;
+
+  color:#c4d0bd;
+
+  background:#11170e;
+  border:1px solid rgba(110,130,84,.3);
+
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+.plantCycle span small{
+  display:block;
+  margin-top:4px;
+  color:#777f73;
+}
+
+.plantCycle b{
+  color:#71895b;
+  font-size:20px;
+}
+
+/* =========================================================
+   PREÇOS
+   ========================================================= */
+
+.guidePrice{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+
+  padding:17px 0;
+
+  border-bottom:1px solid rgba(117,133,102,.18);
+}
+
+.guidePrice span{
+  color:#c2c9be;
+}
+
+.guidePrice strong{
+  color:#aebe9a;
+}
+
+/* =========================================================
+   CARDS PRINCIPAIS
+   ========================================================= */
+
+.cards{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+
+  gap:24px!important;
+
+  margin:48px 0 55px!important;
+}
+
+.card{
+  position:relative;
+
+  width:100%!important;
+  min-width:0!important;
+  min-height:285px!important;
+
+  padding:30px 27px!important;
+
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:space-between!important;
+
+  text-align:left!important;
+
+  color:#e9ede7!important;
+
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(106,136,72,.13),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #172015,
+      #080c08 75%
+    )!important;
+
+  border:1px solid rgba(121,146,91,.38)!important;
+  border-radius:14px!important;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.58),
+    inset 0 1px rgba(255,255,255,.035)!important;
+
+  cursor:pointer;
+
+  overflow:hidden;
+
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+/* barra superior */
+
+.card:before{
+  content:"";
+
+  position:absolute;
+  top:0;
+  left:0;
+
+  width:100%;
+  height:3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #748a5b,
+      transparent 75%
+    );
+
+  opacity:.8;
+}
+
+/* brilho */
+
+.card:after{
+  content:"";
+
+  position:absolute;
+  width:180px;
+  height:180px;
+
+  right:-90px;
+  top:-90px;
+
+  border-radius:50%;
+
+  background:rgba(122,154,82,.09);
+  filter:blur(20px);
+}
+
+.card:hover{
+  transform:translateY(-9px) scale(1.015)!important;
+
+  border-color:rgba(161,187,119,.7)!important;
+
+  box-shadow:
+    0 28px 60px rgba(0,0,0,.72),
+    0 0 28px rgba(108,143,70,.10)!important;
+}
+
+.card>span{
+  position:relative;
+  z-index:1;
+
+  font-size:58px!important;
+  line-height:1!important;
+}
+
+.card h3{
+  position:relative;
+  z-index:1;
+
+  margin:18px 0 10px!important;
+
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  font-size:28px!important;
+  letter-spacing:1px;
+
+  color:#d8dfd3!important;
+}
+
+.card p{
+  position:relative;
+  z-index:1;
+
+  margin:0 0 25px!important;
+
+  color:#8e988a!important;
+
+  font-size:15px!important;
+  line-height:1.55!important;
+}
+
+.card>b{
+  position:relative;
+  z-index:1;
+
+  color:#8fa873!important;
+
+  font-size:14px!important;
+  letter-spacing:1px;
+}
+
+/* cada função ganha um detalhe diferente */
+
+.card:nth-child(1):before{
+  background:linear-gradient(90deg,#71984b,transparent 75%);
+}
+
+.card:nth-child(2):before{
+  background:linear-gradient(90deg,#547e8b,transparent 75%);
+}
+
+.card:nth-child(3):before{
+  background:linear-gradient(90deg,#ad7438,transparent 75%);
+}
+
+.card:nth-child(1) h3{
+  color:#a9c982!important;
+}
+
+.card:nth-child(2) h3{
+  color:#91b9c5!important;
+}
+
+.card:nth-child(3) h3{
+  color:#d0a16a!important;
+}
+
+/* =========================================================
+   PREÇOS ANTIGOS — visual integrado
+   ========================================================= */
+
+.prices{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+
+  margin-top:10px;
+}
+
+.prices div{
+  padding:23px;
+
+  text-align:center;
+
+  background:
+    linear-gradient(145deg,#121710,#080b07);
+
+  border:1px solid rgba(110,128,88,.25);
+}
+
+.prices b{
+  color:#aab99b;
+}
+
+.prices span{
+  display:block;
+  margin:8px 0;
+  color:#727a70;
+}
+
+.prices strong{
+  display:block;
+  font-size:23px;
+  color:#d0d5cc;
+}
+
+/* =========================================================
+   PAINÉIS DE VENDA/COMPRA/RANKING
+   ========================================================= */
+
+.panel{
+  max-width:780px;
+  margin:25px auto;
+
+  padding:32px;
+
+  background:
+    linear-gradient(145deg,#131911,#070a07);
+
+  border:1px solid rgba(113,136,86,.32);
+
+  box-shadow:
+    0 20px 45px rgba(0,0,0,.58);
+}
+
+.panel h2{
+  font-family:Impact,"Arial Black",Arial,sans-serif;
+  color:#c8d2c1;
+  letter-spacing:2px;
+}
+
+.panel label{
+  display:block;
+  margin:20px 0;
+
+  color:#919b8d;
+  font-weight:800;
+}
+
+.panel input{
+  display:block;
+  width:100%;
+
+  margin-top:8px;
+  padding:15px;
+
+  color:#e8ece5;
+  background:#050705;
+
+  border:1px solid rgba(116,139,91,.35);
+
+  font-size:16px;
+  outline:none;
+}
+
+.panel input:focus{
+  border-color:#819d64;
+  box-shadow:0 0 15px rgba(119,151,78,.08);
+}
+
+.product{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:20px;
+
+  padding:20px 0;
+
+  border-bottom:1px solid rgba(111,127,101,.18);
+}
+
+.product small{
+  display:block;
+  margin-top:6px;
+  color:#70796e;
+}
+
+.product button{
+  background:#141b10;
+  color:#e5e9e1;
+
+  border:1px solid #50633e;
+
+  padding:9px 14px;
+
+  font-size:18px;
+}
+
+.product b{
+  padding:0 16px;
+}
+
+.total{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  gap:15px;
+
+  margin:22px 0;
+  padding:20px;
+
+  background:#080c07;
+
+  border:1px solid rgba(120,139,95,.25);
+}
+
+.total strong{
+  color:#b7cf8e;
+  font-size:23px;
+}
+
+.action{
+  width:100%;
+
+  padding:16px;
+
+  color:#f1f4ed;
+
+  background:
+    linear-gradient(135deg,#657f43,#354827);
+
+  border:0;
+
+  font-weight:1000;
+  letter-spacing:1px;
+
+  cursor:pointer;
+
+  transition:.2s;
+}
+
+.action:hover{
+  background:
+    linear-gradient(135deg,#819e55,#4a6034);
+
+  transform:translateY(-2px);
+}
+
+/* =========================================================
+   RANKING
+   ========================================================= */
+
+.rank{
+  display:grid;
+  grid-template-columns:65px 1fr auto;
+  gap:10px;
+
+  padding:18px 0;
+
+  border-bottom:1px solid rgba(115,130,105,.18);
+}
+
+.rank b{
+  color:#c49454;
+}
+
+.rank strong{
+  color:#a9c783;
+}
+
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+
+footer{
+  padding:45px 20px;
+
+  text-align:center;
+
+  background:
+    linear-gradient(180deg,#060806,#020302);
+
+  border-top:1px solid rgba(110,126,95,.18);
+
+  color:#718066;
+
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+footer small{
+  color:#4e574c;
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media(max-width:760px){
+
+  .hero{
+    min-height:500px;
   }
 
-  .admin-stat {
-    padding: 14px;
+  .heroText{
+    padding:48px 17px 38px;
   }
 
-  .admin-stat > strong {
-    font-size: 24px;
+  .heroText h1{
+    font-size:clamp(35px,11vw,60px);
+  }
+
+  .heroText p{
+    font-size:10px;
+    letter-spacing:1.8px;
+  }
+
+  .logo{
+    margin-top:45px;
+    font-size:clamp(48px,15vw,82px);
+    letter-spacing:2px;
+  }
+
+  .heroText>strong{
+    font-size:12px;
+    letter-spacing:2px;
+  }
+
+  .heroText em{
+    font-size:9px;
+    padding:9px 11px;
+  }
+
+  nav{
+    gap:7px;
+    padding:12px 8px;
+  }
+
+  nav button{
+    flex:1 1 auto;
+    padding:11px 9px;
+    font-size:11px;
+  }
+
+  .wrap{
+    padding:38px 14px 60px;
+  }
+
+  /* CARDS: grandes e lado a lado com rolagem */
+  .cards{
+    display:flex!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+
+    gap:15px!important;
+
+    margin:40px -2px 50px!important;
+    padding:8px 3px 18px!important;
+
+    scroll-snap-type:x mandatory!important;
+
+    scrollbar-width:none;
+  }
+
+  .cards::-webkit-scrollbar{
+    display:none;
+  }
+
+  .card{
+    flex:0 0 82vw!important;
+    width:82vw!important;
+
+    min-height:280px!important;
+
+    scroll-snap-align:center!important;
+  }
+
+  .card>span{
+    font-size:62px!important;
+  }
+
+  .card h3{
+    font-size:28px!important;
+  }
+
+  .card p{
+    font-size:16px!important;
+  }
+
+  .prices{
+    grid-template-columns:1fr;
+  }
+
+  .guideCard{
+    padding:22px 18px;
+  }
+
+  .plantCycle{
+    justify-content:flex-start;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    padding:18px;
+  }
+
+  .plantCycle span{
+    flex:0 0 auto;
+  }
+
+  .plantCycle b{
+    flex:0 0 auto;
+  }
+
+  .guidePrice{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:7px;
+  }
+
+  .product{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .total{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .rank{
+    grid-template-columns:45px 1fr;
+  }
+
+  .rank strong{
+    grid-column:2;
   }
 }
 
+
+/* =========================================================
+   CARDS PRINCIPAIS — FORMATO QUADRADO E LIMPO
+   ========================================================= */
+
+.mainActions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  padding: 28px 18px !important;
+  max-width: 1120px !important;
+  margin: 0 auto !important;
+}
+
+.mainActions .actionCard {
+  position: relative !important;
+
+  min-height: 270px !important;
+  aspect-ratio: 1 / 1.05 !important;
+
+  padding: 24px 18px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  text-align: center !important;
+
+  background:
+    radial-gradient(circle at 50% 15%, rgba(120,145,90,.12), transparent 42%),
+    linear-gradient(145deg,#171d14,#070a07) !important;
+
+  border: 1px solid rgba(123,145,99,.38) !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.60),
+    inset 0 1px rgba(255,255,255,.035) !important;
+
+  overflow: hidden !important;
+
+  cursor: pointer !important;
+
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease !important;
+}
+
+.mainActions .actionCard:hover {
+  transform: translateY(-7px) !important;
+  border-color: rgba(163,190,130,.72) !important;
+
+  box-shadow:
+    0 28px 55px rgba(0,0,0,.72),
+    0 0 28px rgba(117,153,77,.12) !important;
+}
+
+.mainActions .actionArt {
+  position: relative !important;
+
+  width: 135px !important;
+  height: 135px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin-bottom: 18px !important;
+
+  border-radius: 50% !important;
+
+  background:
+    radial-gradient(circle, rgba(132,157,101,.13), rgba(0,0,0,.08) 65%, transparent 70%) !important;
+
+  border: 1px solid rgba(128,151,102,.18) !important;
+
+  box-shadow:
+    inset 0 0 28px rgba(120,145,91,.08),
+    0 10px 25px rgba(0,0,0,.45) !important;
+}
+
+.mainActions .actionArt span {
+  font-size: 72px !important;
+  line-height: 1 !important;
+  filter: drop-shadow(0 7px 12px rgba(0,0,0,.5)) !important;
+}
+
+.mainActions .actionCard strong {
+  font-family: Impact, "Arial Black", Arial, sans-serif !important;
+
+  font-size: 29px !important;
+  line-height: 1.05 !important;
+
+  letter-spacing: 1.5px !important;
+
+  color: #e3e7e0 !important;
+}
+
+.mainActions .actionHerbs strong {
+  color: #a8c884 !important;
+}
+
+.mainActions .actionSupplies strong {
+  color: #8fb8c1 !important;
+}
+
+.mainActions .actionRanking strong {
+  color: #d0a06a !important;
+}
+
+/* detalhes de cada card */
+.mainActions .actionHerbs {
+  background:
+    radial-gradient(circle at 50% 15%, rgba(105,157,70,.18), transparent 42%),
+    linear-gradient(145deg,#172216,#070a07) !important;
+}
+
+.mainActions .actionSupplies {
+  background:
+    radial-gradient(circle at 50% 15%, rgba(61,115,128,.18), transparent 42%),
+    linear-gradient(145deg,#141e20,#070a07) !important;
+}
+
+.mainActions .actionRanking {
+  background:
+    radial-gradient(circle at 50% 15%, rgba(153,96,48,.18), transparent 42%),
+    linear-gradient(145deg,#211b14,#080907) !important;
+}
+
+/* celular */
+@media (max-width: 760px) {
+
+  .mainActions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 18px 8px 30px !important;
+  }
+
+  .mainActions .actionCard {
+    min-height: 155px !important;
+    aspect-ratio: 1 / 1.12 !important;
+    padding: 12px 6px !important;
+    border-radius: 12px !important;
+  }
+
+  .mainActions .actionArt {
+    width: 68px !important;
+    height: 68px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .mainActions .actionArt span {
+    font-size: 42px !important;
+  }
+
+  .mainActions .actionCard strong {
+    font-size: 14px !important;
+    letter-spacing: .5px !important;
+    line-height: 1.05 !important;
+  }
+}
+
+/* =========================================================
+   NOVO ESTILO — CARDS DE SOBREVIVÊNCIA
+   ========================================================= */
+
+.mainActions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 22px !important;
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+  padding: 30px 18px 42px !important;
+}
+
+.mainActions .actionCard {
+  position: relative !important;
+  min-width: 0 !important;
+  min-height: 285px !important;
+  aspect-ratio: 1 / 1.02 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 24px !important;
+
+  color: #eee !important;
+  text-align: center !important;
+
+  background:
+    linear-gradient(135deg,
+      rgba(255,255,255,.035),
+      transparent 35%),
+    linear-gradient(160deg,#171b17,#090c09 75%) !important;
+
+  border: 1px solid rgba(180,190,170,.28) !important;
+  border-radius: 10px !important;
+
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.65),
+    inset 0 0 30px rgba(255,255,255,.018) !important;
+
+  overflow: hidden !important;
+  cursor: pointer !important;
+
+  transition:
+    transform .22s ease,
+    border-color .22s ease,
+    box-shadow .22s ease !important;
+}
+
+/* pequenos detalhes de placa */
+.mainActions .actionCard::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 7px !important;
+  border: 1px solid rgba(255,255,255,.045) !important;
+  border-radius: 7px !important;
+  pointer-events: none !important;
+}
+
+.mainActions .actionCard::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 90px !important;
+  height: 90px !important;
+  right: -45px !important;
+  top: -45px !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  transform: rotate(45deg) !important;
+}
+
+/* desenho principal */
+.mainActions .actionVisual {
+  position: relative !important;
+  width: 145px !important;
+  height: 125px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin-bottom: 13px !important;
+}
+
+.mainActions .visualCircle {
+  width: 108px !important;
+  height: 108px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  border-radius: 50% !important;
+
+  background:
+    radial-gradient(circle,
+      rgba(255,255,255,.10),
+      rgba(255,255,255,.015) 68%,
+      transparent 70%) !important;
+
+  border: 1px solid rgba(210,215,200,.22) !important;
+
+  font-size: 62px !important;
+
+  box-shadow:
+    0 12px 25px rgba(0,0,0,.55),
+    inset 0 0 25px rgba(255,255,255,.035) !important;
+}
+
+.mainActions .visualLine {
+  position: absolute !important;
+  width: 145px !important;
+  height: 1px !important;
+  bottom: 0 !important;
+  left: 0 !important;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(190,200,180,.28),
+    transparent
+  ) !important;
+}
+
+/* títulos */
+.mainActions .actionTitle {
+  position: relative !important;
+  z-index: 2 !important;
+
+  font-family:
+    Impact,
+    "Arial Black",
+    Arial,
+    sans-serif !important;
+
+  font-size: 30px !important;
+  line-height: 1 !important;
+  letter-spacing: 2px !important;
+
+  color: #e5e8e2 !important;
+
+  text-shadow: 0 3px 8px #000 !important;
+}
+
+.mainActions .actionCard small {
+  position: relative !important;
+  z-index: 2 !important;
+
+  margin-top: 9px !important;
+
+  color: #999f98 !important;
+  font-size: 13px !important;
+}
+
+.mainActions .actionCard > b {
+  position: relative !important;
+  z-index: 2 !important;
+
+  margin-top: 15px !important;
+
+  color: #c3cfb9 !important;
+  font-size: 12px !important;
+  letter-spacing: 1.5px !important;
+}
+
+/* detalhes individuais */
+.mainActions .actionHerbs {
+  border-color: rgba(117,156,89,.38) !important;
+}
+
+.mainActions .actionHerbs .visualCircle {
+  border-color: rgba(137,181,103,.35) !important;
+}
+
+.mainActions .actionHerbs .actionTitle {
+  color: #a9cb91 !important;
+}
+
+.mainActions .actionSupplies {
+  border-color: rgba(93,139,151,.38) !important;
+}
+
+.mainActions .actionSupplies .visualCircle {
+  border-color: rgba(103,157,174,.35) !important;
+}
+
+.mainActions .actionSupplies .actionTitle {
+  color: #9dc3cd !important;
+}
+
+.mainActions .actionRanking {
+  border-color: rgba(169,128,78,.38) !important;
+}
+
+.mainActions .actionRanking .visualCircle {
+  border-color: rgba(190,145,88,.35) !important;
+}
+
+.mainActions .actionRanking .actionTitle {
+  color: #d1ad7c !important;
+}
+
+/* efeito ao passar/tocar */
+.mainActions .actionCard:hover {
+  transform: translateY(-8px) !important;
+
+  box-shadow:
+    0 28px 55px rgba(0,0,0,.78),
+    inset 0 0 35px rgba(255,255,255,.025) !important;
+}
+
+.mainActions .actionHerbs:hover {
+  border-color: rgba(150,195,115,.75) !important;
+}
+
+.mainActions .actionSupplies:hover {
+  border-color: rgba(120,180,195,.75) !important;
+}
+
+.mainActions .actionRanking:hover {
+  border-color: rgba(205,158,98,.75) !important;
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  .mainActions {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    padding: 22px 7px 35px !important;
+  }
+
+  .mainActions .actionCard {
+    min-height: 205px !important;
+    aspect-ratio: 1 / 1.08 !important;
+    padding: 12px 6px !important;
+    border-radius: 9px !important;
+  }
+
+  .mainActions .actionVisual {
+    width: 82px !important;
+    height: 76px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .mainActions .visualCircle {
+    width: 68px !important;
+    height: 68px !important;
+    font-size: 39px !important;
+  }
+
+  .mainActions .visualLine {
+    width: 82px !important;
+  }
+
+  .mainActions .actionTitle {
+    font-size: 15px !important;
+    letter-spacing: .7px !important;
+  }
+
+  .mainActions .actionCard small {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    margin-top: 7px !important;
+  }
+
+  .mainActions .actionCard > b {
+    font-size: 9px !important;
+    margin-top: 10px !important;
+    letter-spacing: .8px !important;
+  }
+}
+
+/* ===== CORREÇÃO DEFINITIVA DOS CARDS NO CELULAR ===== */
+
+.mainActions {
+  width: 100% !important;
+  max-width: 1100px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.mainActions .actionCard {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 760px) {
+
+  .mainActions {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 10px !important;
+
+    padding: 22px 10px 35px !important;
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .mainActions .actionCard {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    min-height: 220px !important;
+    height: 220px !important;
+
+    aspect-ratio: auto !important;
+
+    padding: 12px 5px !important;
+
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .mainActions .actionVisual {
+    width: 75px !important;
+    height: 72px !important;
+  }
+
+  .mainActions .visualCircle {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 36px !important;
+  }
+
+  .mainActions .visualLine {
+    width: 75px !important;
+  }
+
+  .mainActions .actionTitle {
+    font-size: 14px !important;
+    letter-spacing: .5px !important;
+    white-space: nowrap !important;
+  }
+
+  .mainActions .actionCard small {
+    max-width: 100% !important;
+    font-size: 8px !important;
+    white-space: normal !important;
+    line-height: 1.2 !important;
+  }
+
+  .mainActions .actionCard > b {
+    font-size: 8px !important;
+    margin-top: 9px !important;
+  }
+}
+
+/* impede a página inteira de criar rolagem horizontal */
+html,
+body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+
+
+/* ===== CENÁRIO DO HOLOCAUSTO — DEFINITIVO ===== */
+
+.hero {
+  position: relative !important;
+  background-image: url("/holocausto-bg.png") !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-color: #07100b !important;
+}
+
+.hero::before,
+.hero::after,
+.hero .shade {
+  display: none !important;
+}
+
+/* ===== MELHORIA DE LEITURA — FRASE DO SERVIDOR ===== */
+.heroText p {
+  color: #c4cfb5 !important;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.9) !important;
+}
+
+/* ===== FRASE DO HOLOCAUSTO — CONTRASTE MAIS FORTE ===== */
+.heroText p {
+  color: #66705f !important;
+  text-shadow:
+    2px 2px 4px rgba(0,0,0,0.95),
+    0 0 2px rgba(0,0,0,0.8) !important;
+  font-weight: 600 !important;
+}
+
+/* Ajuste da frase abaixo do nome do servidor */
+.heroText p {
+  color: #8f968f !important;
+  text-shadow: 1px 1px 3px #000 !important;
+}
+
+.heroText p {
+  color: #B0B8A8 !important;
+  text-shadow: 1px 1px 3px #000 !important;
+}

@@ -46,10 +46,122 @@ export default function Home(){
    setNotice(`Pedido #${Date.now()} enviado com sucesso.`); setMode("home");
  }
  return <main>
-  <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO <i>Z</i></h1><p>O CAOS MOVE. A ESTRATÉGIA VENCE.</p><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & SUPRIMENTOS</strong><em>NEGOCIE. PLANTE. FORTALEÇA O SERVIDOR.</em></div></header>
-  <nav>{[["home","Início"],["sell","🌿 Vender Ervas"],["buy","🛒 Comprar Suprimentos"],["ranking","🏆 Top 10 da Semana"]].map(([id,label])=><button key={id} onClick={()=>{setMode(id as any);setNotice("")}}>{label}</button>)}</nav>
+  <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO</h1><p>A ÚLTIMA ESPERANÇA AINDA BROTA.</p><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>DA SEMENTE, NASCE A SOBREVIVÊNCIA.</em><div className="hero-admin"><button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Admin</button></div></div></header>
+  <nav className="mainActions">
+
+  <button className="actionCard actionHerbs" onClick={() => {setMode("sell");setNotice("")}}>
+    <div className="actionVisual">
+      <div className="visualCircle">🌿</div>
+      <span className="visualLine"></span>
+    </div>
+    <div className="actionTitle">ERVAS</div>
+    <small>Vender colheita</small>
+    <b>ENTRAR →</b>
+  </button>
+
+  <button className="actionCard actionSupplies" onClick={() => {setMode("buy");setNotice("")}}>
+    <div className="actionVisual">
+      <div className="visualCircle">📦</div>
+      <span className="visualLine"></span>
+    </div>
+    <div className="actionTitle">SUPRIMENTOS</div>
+    <small>Sementes e fertilizante</small>
+    <b>ENTRAR →</b>
+  </button>
+
+  <button className="actionCard actionRanking" onClick={() => {setMode("ranking");setNotice("")}}>
+    <div className="actionVisual">
+      <div className="visualCircle">🏆</div>
+      <span className="visualLine"></span>
+    </div>
+    <div className="actionTitle">TOP 10</div>
+    <small>Ranking semanal</small>
+    <b>ENTRAR →</b>
+  </button>
+
+</nav>
   <div className="wrap">{notice&&<div className="notice">{notice}</div>}
-   {mode==="home"&&<><section className="intro"><h2>CENTRAL DE COMÉRCIO</h2><p>Agende sua venda de ervas ou sua compra de sementes e fertilizantes. A negociação é realizada dentro do jogo.</p></section><div className="cards"><Card icon="🌿" title="Vender Ervas" text="Informe a quantidade e agende sua venda." onClick={()=>setMode("sell")}/><Card icon="🛒" title="Comprar Suprimentos" text="Escolha sementes, fertilizante ou os dois em um único pedido." onClick={()=>setMode("buy")}/><Card icon="🏆" title="Top 10 da Semana" text="Veja os dez maiores vendedores da semana." onClick={()=>setMode("ranking")}/></div><div className="prices"><Price title="Ervas Medicinais" detail="50 unidades" value="15.000 DZ"/><Price title="Sementes" detail="4 pacotinhos" value="2.000 DZ"/><Price title="Fertilizante" detail="1 unidade" value="2.500 DZ"/></div></>}
+   {mode==="home"&&<>
+<section className="guide">
+  <div className="guideIntro">
+    <h2>GUIA DO DISTRITO ZERO</h2>
+    <p>
+      Informações, valores e orientações para os jogadores do
+      <strong> DayZ no Xbox e PlayStation</strong>.
+    </p>
+  </div>
+
+  <div className="guideCard">
+    <h3>🌱 COMO PLANTAR</h3>
+    <p>
+      O processo de plantação no servidor segue um ciclo simples:
+    </p>
+
+    <div className="plantCycle">
+      <span>🌱 SEMENTE</span>
+      <b>→</b>
+      <span>🧪 FERTILIZANTE <small>(OPCIONAL)</small></span>
+      <b>→</b>
+      <span>💧 ÁGUA</span>
+      <b>→</b>
+      <span>🌿 CRESCIMENTO</span>
+      <b>→</b>
+      <span>🌿 COLHEITA</span>
+      <b>→</b>
+      <span>🪓 REMOVER</span>
+      <b>→</b>
+      <span>🔄 NOVA PLANTAÇÃO</span>
+    </div>
+
+    <p>
+      O fertilizante é opcional. Mesmo sem fertilizante, é possível
+      realizar a plantação. Depois de plantar, aguarde o crescimento
+      e o desenvolvimento da planta.
+    </p>
+
+    <p>
+      Quando a planta estiver desenvolvida e produzir os frutos,
+      faça a colheita. Depois, retire o pé que ficou sem frutos e
+      prepare o local para uma nova plantação.
+    </p>
+  </div>
+
+  <div className="guideCard">
+    <h3>💰 VALORES DO DISTRITO ZERO</h3>
+
+    <div className="guidePrice">
+      <span>🌿 Ervas Medicinais</span>
+      <strong>50 unidades — 15.000 DZ</strong>
+    </div>
+
+    <div className="guidePrice">
+      <span>🌱 Sementes</span>
+      <strong>4 pacotinhos — 2.000 DZ</strong>
+    </div>
+
+    <div className="guidePrice">
+      <span>🧪 Fertilizante</span>
+      <strong>1 unidade — 2.500 DZ</strong>
+    </div>
+  </div>
+
+  <div className="guideCard">
+    <h3>📜 REGRAS DA NEGOCIAÇÃO</h3>
+    <p>🤝 Negociações devem ser realizadas dentro do servidor.</p>
+    <p>📍 Siga as orientações do Distrito Zero para a entrega.</p>
+    <p>🎮 As informações deste guia são destinadas aos jogadores de console.</p>
+    <p>🚫 Procedimentos específicos da versão PC não fazem parte deste guia.</p>
+  </div>
+
+  <div className="guideCard consoleNotice">
+    <h3>🎮 CONSOLE</h3>
+    <p>
+      Este guia foi preparado para <strong>DayZ no Xbox e PlayStation</strong>.
+      Controles e procedimentos podem ser diferentes na versão para PC.
+    </p>
+  </div>
+</section>
+</>}
         {mode==="ranking"&&<Panel title="🏆 TOP 10 DA SEMANA"><p className="muted">Ranking atualizado automaticamente pelas vendas realizadas durante a semana.</p>{Array.from({length:10},(_,i)=>ranking[i]||{gamertag:"VAGO",quantidade_ervas:0}).map((x,i)=><div className="rank" key={i}><b>{i+1}º</b><span>{x.gamertag}</span>{x.quantidade_ervas>0&&<strong>{Number(x.quantidade_ervas).toLocaleString("pt-BR")} ervas</strong>}</div>)}</Panel>}
    {mode==="sell"&&<Panel title="🌿 VENDER ERVAS">
 <label>
@@ -83,7 +195,7 @@ AGENDAR VENDA
 </Panel>}
 
 {mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><label>Gamertag<input value={gamertag} onChange={e=>setGamertag(e.target.value)} placeholder="Nome no jogo"/></label><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><button onClick={()=>setSeeds(Math.max(0,seeds-1))}>−</button><b>{seeds}</b><button onClick={()=>setSeeds(seeds+1)}>+</button></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><button onClick={()=>setFert(Math.max(0,fert-1))}>−</button><b>{fert}</b><button onClick={()=>setFert(fert+1)}>+</button></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
-  </div><footer><a href="/administracao/login" style={{fontSize:"14px",opacity:0.35,textDecoration:"none"}}>🔒</a>DISTRITO ZERO • HOLOCAUSTO Z<br/><small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
+  </div><footer>DISTRITO ZERO • HOLOCAUSTO • <small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
  </main>
 }
 function Card(p:any){return <button className="card" onClick={p.onClick}><span>{p.icon}</span><h3>{p.title}</h3><p>{p.text}</p><b>ACESSAR →</b></button>}

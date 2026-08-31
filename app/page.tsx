@@ -163,7 +163,137 @@ export default function Home(){
   </div>
 </section>
 </>}
-        {mode==="ranking"&&<Panel title="🏆 TOP 10 DE VENDEDORES"><p className="muted">Ranking acumulado desde o inicio. A classificacao e atualizada automaticamente conforme as vendas.</p>{Array.from({length:10},(_,i)=>ranking[i]||{gamertag:"VAGO",quantidade_ervas:0,valor_arrecadado:0}).map((x,i)=><div className="rank" key={i}><b>{i+1}º</b><span>{x.gamertag}</span>{x.quantidade_ervas>0&&<strong>{Number(x.quantidade_ervas).toLocaleString("pt-BR")} ervas • {Number(x.valor_arrecadado).toLocaleString("pt-BR")} DZCOINS</strong>}</div>)}</Panel>}
+{mode==="ranking"&&
+<Panel title="🏆 RANKING DOS VENDEDORES">
+
+  <div className="ranking-intro">
+    <span>⚔️</span>
+    <div>
+      <strong>DISPUTA PELO TOPO</strong>
+      <p>Ranking acumulado desde o início. Cada venda pode mudar a classificação.</p>
+    </div>
+  </div>
+
+  {ranking[0]&&
+    <div className="rank-champion">
+
+      <div className="rank-crown">👑</div>
+
+      <div className="rank-label">CAMPEÃO ATUAL</div>
+
+      <div className="rank-champion-name">
+        {ranking[0].gamertag}
+      </div>
+
+      <div className="rank-stats">
+
+        <div>
+          <small>🌿 UNIDADES VENDIDAS</small>
+          <strong>
+            {Number(ranking[0].quantidade_ervas).toLocaleString("pt-BR")} ervas
+          </strong>
+        </div>
+
+        <div>
+          <small>💰 TOTAL ARRECADADO</small>
+          <strong>
+            {Number(ranking[0].valor_arrecadado).toLocaleString("pt-BR")} DZCOINS
+          </strong>
+        </div>
+
+      </div>
+
+      <div className="rank-champion-badge">
+        🥇 1º LUGAR
+      </div>
+
+    </div>
+  }
+
+  <div className="rank-podium">
+
+    {[1,2].map(position => {
+      const x = ranking[position];
+      const medal = position === 1 ? "🥈" : "🥉";
+
+      return (
+        <div
+          className={`rank-podium-card rank-position-${position + 1}`}
+          key={position}
+        >
+
+          <div className="rank-medal">{medal}</div>
+
+          <div className="rank-number">{position + 1}º</div>
+
+          <strong className="rank-name">
+            {x?.gamertag || "LUGAR DISPONÍVEL"}
+          </strong>
+
+          <span className="rank-unit">
+            {x
+              ? `${Number(x.quantidade_ervas).toLocaleString("pt-BR")} ervas`
+              : "Seja o próximo a conquistar este lugar"}
+          </span>
+
+          {x&&
+            <span className="rank-money">
+              💰 {Number(x.valor_arrecadado).toLocaleString("pt-BR")} DZCOINS
+            </span>
+          }
+
+        </div>
+      );
+    })}
+
+  </div>
+
+  <div className="rank-list">
+
+    {Array.from({length:7},(_,i) => {
+
+      const position = i + 3;
+      const x = ranking[position];
+
+      return (
+        <div
+          className={`rank-entry ${!x ? "rank-empty" : ""}`}
+          key={position}
+        >
+
+          <div className="rank-entry-position">
+            <b>{position + 1}º</b>
+          </div>
+
+          <div className="rank-entry-player">
+            <strong>{x?.gamertag || "LUGAR DISPONÍVEL"}</strong>
+
+            <small>
+              {x
+                ? `${Number(x.quantidade_ervas).toLocaleString("pt-BR")} ervas`
+                : "Ainda disponível"}
+            </small>
+          </div>
+
+          <div className="rank-entry-money">
+            {x
+              ? `${Number(x.valor_arrecadado).toLocaleString("pt-BR")} DZCOINS`
+              : "—"}
+          </div>
+
+        </div>
+      );
+    })}
+
+  </div>
+
+  <div className="ranking-footer">
+    <span>🔥</span>
+    <strong>VENDA MAIS. SUBA MAIS.</strong>
+    <small>O próximo nome no topo pode ser o seu.</small>
+  </div>
+
+</Panel>}
    {mode==="sell"&&<Panel title="🌿 VENDER ERVAS">
 <label>
 Gametag

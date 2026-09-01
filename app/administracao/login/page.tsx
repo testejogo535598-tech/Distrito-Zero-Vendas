@@ -36,6 +36,18 @@ export default function Login() {
       return;
     }
 
+    // Login válido não é suficiente: a conta também precisa estar
+    // cadastrada como administradora no banco.
+    const { data: adminAutorizado, error: adminError } =
+      await supabase.rpc("is_admin");
+
+    if (adminError || !adminAutorizado) {
+      await supabase.auth.signOut();
+      setErro("Esta conta não tem acesso ao painel administrativo.");
+      setCarregando(false);
+      return;
+    }
+
     router.replace("/administracao");
   }
 

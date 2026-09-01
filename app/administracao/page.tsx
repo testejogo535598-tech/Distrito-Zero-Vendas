@@ -25,7 +25,16 @@ export default function Administracao() {
   useEffect(() => {
     async function verificarSessao() {
       const { data: { session } } = await supabase.auth.getSession();
+
       if (!session) {
+        window.location.replace("/administracao/login");
+        return;
+      }
+
+      const { data: adminAutorizado, error } = await supabase.rpc("is_admin");
+
+      if (error || !adminAutorizado) {
+        await supabase.auth.signOut();
         window.location.replace("/administracao/login");
       }
     }
@@ -91,7 +100,7 @@ export default function Administracao() {
     if (pedido.status === "realizado") return;
 
     const { data: pedidoRealizado, error } = await supabase
-      .rpc("marcar_pedido_realizado", {
+      .rpc("admin_marcar_pedido_realizado", {
         p_pedido_id: pedido.id,
       });
 

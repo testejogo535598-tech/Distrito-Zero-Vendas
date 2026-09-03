@@ -19,19 +19,22 @@ export default function Home(){
    if(!gamertag.trim()) return setNotice("Informe sua Gamertag.");
    if(type==="venda" && herbs<=0) return setNotice("Informe a quantidade de ervas.");
    if(type==="compra" && seeds===0 && fert===0) return setNotice("Escolha sementes, fertilizante ou os dois.");
+
    setNotice("Enviando pedido...");
+
    const { data: playerData, error: playerError } = await supabase
     .rpc("obter_ou_criar_jogador", {
       p_gamertag: gamertag.trim(),
     });
 
-    if (playerError || !playerData?.[0]) {
-      console.error(playerError);
-      return setNotice("Não foi possível cadastrar ou identificar o jogador.");
-    }
+   if (playerError || !playerData?.[0]) {
+     console.error(playerError);
+     return setNotice("Não foi possível cadastrar ou identificar o jogador.");
+   }
 
-    const player = playerData[0];
-   const { data: order, error: orderError } = await supabase.from("pedidos").insert({
+   const player = playerData[0];
+
+   const { error: orderError } = await supabase.from("pedidos").insert({
      jogador_id: player.id,
      tipo: type,
      ervas_quantidade: type === "venda" ? herbs : 0,
@@ -40,11 +43,44 @@ export default function Home(){
      valor_total: type === "venda" ? herbValue : buyValue,
      status: "processando"
    });
-   if (orderError) return setNotice(`Erro Supabase: ${orderError.message}`);
-   const localOrder = { id: Date.now(), gamertag: gamertag.trim(), type, herbs: type === "venda" ? herbs : 0, seeds: type === "compra" ? seeds : 0, fert: type === "compra" ? fert : 0, total: type === "venda" ? herbValue : buyValue, status: "processando" };
+
+   if (orderError) {
+     return setNotice(`Erro Supabase: ${orderError.message}`);
+   }
+
+   const localOrder = {
+     id: Date.now(),
+     gamertag: gamertag.trim(),
+     type,
+     herbs: type === "venda" ? herbs : 0,
+     seeds: type === "compra" ? seeds : 0,
+     fert: type === "compra" ? fert : 0,
+     total: type === "venda" ? herbValue : buyValue,
+     status: "processando"
+   };
+
    setOrders(prev => [localOrder, ...prev]);
-   setNotice(`Pedido #${Date.now()} enviado com sucesso.`); setMode("home");
+
+   try {
+     const notificationResponse = await fetch("/api/notificar-pedido", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json"
+       },
+       body: JSON.stringify(localOrder)
+     });
+
+     if (!notificationResponse.ok) {
+       console.error("Não foi possível enviar a notificação por e-mail.");
+     }
+   } catch (error) {
+     console.error("Erro ao chamar a notificação por e-mail:", error);
+   }
+
+   setNotice(`Pedido #${localOrder.id} enviado com sucesso.`);
+   setMode("home");
  }
+
  return <main>
   <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO&nbsp;Z</h1><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>A ÚLTIMA ESPERANÇA AINDA BROTA.</em><div className="hero-admin"><button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Mercador</button></div></div></header>
   <nav className="mainActions">

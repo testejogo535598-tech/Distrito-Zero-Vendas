@@ -309,9 +309,7 @@ placeholder="Nome no jogo"
 <small>1 unidade = 300 DZ</small>
 
 <div className="counter">
-<button onClick={()=>setHerbs(Math.max(0, herbs-1))}>−</button>
-<b>{herbs}</b>
-<button onClick={()=>setHerbs(herbs+1)}>+</button>
+<input type="number" min="0" inputMode="numeric" value={herbs} onChange={e=>setHerbs(Math.max(0, Number(e.target.value)))} />
 </div>
 </div>
 
@@ -325,7 +323,7 @@ AGENDAR VENDA
 </button>
 </Panel>}
 
-{mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><label>Gamertag<input value={gamertag} onChange={e=>setGamertag(e.target.value)} placeholder="Nome no jogo"/></label><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><button onClick={()=>setSeeds(Math.max(0,seeds-1))}>−</button><b>{seeds}</b><button onClick={()=>setSeeds(seeds+1)}>+</button></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><button onClick={()=>setFert(Math.max(0,fert-1))}>−</button><b>{fert}</b><button onClick={()=>setFert(fert+1)}>+</button></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
+{mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><label>Gamertag<input value={gamertag} onChange={e=>setGamertag(e.target.value)} placeholder="Nome no jogo"/></label><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={seeds} onChange={e=>setSeeds(Math.max(0, Number(e.target.value)))} /></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={fert} onChange={e=>setFert(Math.max(0, Number(e.target.value)))} /></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
   </div><footer>DISTRITO ZERO • HOLOCAUSTO • <small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
  </main>
 }

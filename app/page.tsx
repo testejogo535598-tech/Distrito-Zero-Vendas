@@ -115,6 +115,16 @@ export default function Home(){
     <b>ENTRAR →</b>
   </button>
 
+  <button className="actionCard actionStore" onClick={() => {window.location.href="/loja"}}>
+    <div className="actionVisual">
+      <div className="visualCircle">🛒</div>
+      <span className="visualLine"></span>
+    </div>
+    <div className="actionTitle">LOJA</div>
+    <small>Itens para sobrevivência</small>
+    <b>ENTRAR →</b>
+  </button>
+
 </nav>
   <div className="wrap">{notice&&<div className="notice">{notice}</div>}
    {mode!=="home"&&<button className="backHome" onClick={()=>{setMode("home");setNotice("")}}>← INÍCIO</button>}

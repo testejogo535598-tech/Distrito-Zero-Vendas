@@ -34,6 +34,11 @@ const categorias = [
   { id: "construcao", nome: "CONSTRUÇÃO" },
   { id: "armas-brancas", nome: "ARMAS BRANCAS" },
   { id: "armas", nome: "ARMAS" },
+  { id: "explosivos", nome: "EXPLOSIVOS" },
+  { id: "municao", nome: "MUNIÇÃO" },
+  { id: "vestuario", nome: "VESTUÁRIO" },
+  { id: "pecas", nome: "PEÇAS" },
+  { id: "especiais", nome: "ITENS EXCLUSIVOS" },
 ];
 
 export default function Administracao() {
@@ -48,6 +53,7 @@ export default function Administracao() {
 
   const [nomeProduto, setNomeProduto] = useState("");
   const [categoriaProduto, setCategoriaProduto] = useState("construcao");
+  const [buscaProduto, setBuscaProduto] = useState("");
   const [precoProduto, setPrecoProduto] = useState("");
 
   const [editandoId, setEditandoId] = useState<number | null>(null);
@@ -474,6 +480,14 @@ export default function Administracao() {
           </>
         )}
 
+        <input
+          type="text"
+          placeholder="🔎 Buscar produto por nome, categoria ou ID"
+          value={buscaProduto}
+          onChange={(e) => setBuscaProduto(e.target.value)}
+          style={{ marginTop: "16px" }}
+        />
+
         <div style={{ marginTop: "20px" }}>
 
           {carregandoItens && (
@@ -487,158 +501,254 @@ export default function Administracao() {
               Nenhum produto cadastrado.
             </p>
           )}
-
           {!carregandoItens &&
-            itens.map((item) => (
-              <article
-                key={item.id}
-                className="admin-order"
-              >
+            categorias.map((categoria) => {
+              const termo = buscaProduto.trim().toLowerCase();
 
-                <div>
+              const produtosCategoria = itens.filter((item) => {
+                const correspondeCategoria = item.categoria === categoria.id;
 
-                  <b>
-                    {item.nome}
-                  </b>
+                if (!correspondeCategoria) return false;
+                if (!termo) return true;
 
-                  <span>
-                    {nomeCategoria(item.categoria)}
-                  </span>
+                return (
+                  item.nome.toLowerCase().includes(termo) ||
+                  nomeCategoria(item.categoria).toLowerCase().includes(termo) ||
+                  String(item.id).includes(termo)
+                );
+              });
 
-                  <small>
-                    ID: {item.id}
-                  </small>
+              return (
+                <details
+                  className="admin-product-group"
+                  key={categoria.id}
+                >
+                  <summary>
+                    <span>{categoria.nome}</span>
+                    <strong>{produtosCategoria.length}</strong>
+                  </summary>
 
-                </div>
+                  <div className="admin-product-list">
+                    {produtosCategoria.length === 0 ? (
+                      <p className="muted admin-product-empty">
+                        Nenhum produto nesta categoria.
+                      </p>
+                    ) : (
+                      produtosCategoria.map((item) => (
+                        <article
+                          key={item.id}
+                          className="admin-product"
+                        >
 
-                <div>
+                          <div>
+                            <b>{item.nome}</b>
 
-                  <strong>
-                    {Number(item.valor).toLocaleString("pt-BR")} DZ
-                  </strong>
+                            <span>
+                              {nomeCategoria(item.categoria)}
+                            </span>
 
-                  <button
-                    type="button"
-                    onClick={() => iniciarEdicao(item)}
-                  >
-                    ✏️
-                  </button>
+                            <small>
+                              ID: {item.id}
+                            </small>
+                          </div>
 
-                  <button
-                    type="button"
-                    className="delete-order"
-                    onClick={() => excluirProduto(item)}
-                    title="Excluir produto"
-                    aria-label="Excluir produto"
-                  >
-                    🗑️
-                  </button>
+                          <div>
+                            <strong>
+                              {Number(item.valor).toLocaleString("pt-BR")} DZ
+                            </strong>
 
-                </div>
+                            <button
+                              type="button"
+                              onClick={() => iniciarEdicao(item)}
+                            >
+                              ✏️
+                            </button>
 
-              </article>
-            ))}
+                            <button
+                              type="button"
+                              className="delete-order"
+                              onClick={() => excluirProduto(item)}
+                              title="Excluir produto"
+                              aria-label="Excluir produto"
+                            >
+                              🗑️
+                            </button>
+                          </div>
 
+                        </article>
+                      ))
+                    )}
+                  </div>
+                </details>
+              );
+            })}
         </div>
 
-      </section>
+      </section>        {/* PEDIDOS */}
 
-      {/* PEDIDOS */}
+        <section className="panel">
 
-      <section className="panel">
+          <h2>📋 PEDIDOS</h2>
 
-        <h2>📋 PEDIDOS</h2>
+          {carregando && (
+            <p className="muted">
+              Carregando pedidos...
+            </p>
+          )}
 
-        {carregando && (
-          <p className="muted">
-            Carregando pedidos...
-          </p>
-        )}
+          {!carregando && pedidos.length === 0 && (
+            <p className="muted">
+              Nenhum pedido encontrado.
+            </p>
+          )}
 
-        {!carregando && pedidos.length === 0 && (
-          <p className="muted">
-            Nenhum pedido encontrado.
-          </p>
-        )}
+          {!carregando && pedidos.length > 0 && (
+            <>
+              <details className="admin-order-group" open>
+                <summary>
+                  <span>🆕 NOVOS PEDIDOS</span>
+                  <strong>
+                    {pedidos.filter(
+                      (pedido) => pedido.status !== "realizado"
+                    ).length}
+                  </strong>
+                </summary>
 
-        {[...pedidos]
-          .sort(
-            (a, b) =>
-              Number(a.status === "realizado") -
-              Number(b.status === "realizado")
-          )
-          .map((pedido) => (
+                <div className="admin-order-list">
+                  {pedidos
+                    .filter(
+                      (pedido) => pedido.status !== "realizado"
+                    )
+                    .map((pedido) => (
+                      <article
+                        className="admin-order"
+                        key={pedido.id}
+                      >
+                        <div>
+                          <b>#{pedido.id}</b>
 
-            <article
-              className="admin-order"
-              key={pedido.id}
-            >
+                          <span>
+                            {getGamertag(pedido)}
+                          </span>
 
-              <div>
+                          <small>
+                            {pedido.tipo === "venda"
+                              ? `Venda de ${Number(
+                                  pedido.ervas_quantidade
+                                ).toLocaleString("pt-BR")} ervas`
+                              : `Compra: ${Number(
+                                  pedido.sementes_pacotes
+                                )} sementes + ${Number(
+                                  pedido.fertilizante_quantidade
+                                )} fertilizantes`}
+                          </small>
+                        </div>
 
-                <b>
-                  #{pedido.id}
-                </b>
+                        <div>
+                          <strong>
+                            {Number(
+                              pedido.valor_total
+                            ).toLocaleString("pt-BR")}{" "}
+                            DZ
+                          </strong>
 
-                <span>
-                  {getGamertag(pedido)}
-                </span>
+                          <button
+                            onClick={() =>
+                              finalizarPedido(pedido)
+                            }
+                          >
+                            Marcar realizado
+                          </button>
 
-                <small>
-                  {pedido.tipo === "venda"
-                    ? `Venda de ${Number(
-                        pedido.ervas_quantidade
-                      ).toLocaleString("pt-BR")} ervas`
-                    : `Compra: ${Number(
-                        pedido.sementes_pacotes
-                      )} sementes + ${Number(
-                        pedido.fertilizante_quantidade
-                      )} fertilizantes`}
-                </small>
+                          <button
+                            type="button"
+                            className="delete-order"
+                            onClick={() =>
+                              excluirPedido(pedido)
+                            }
+                            title="Excluir pedido"
+                            aria-label="Excluir pedido"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                </div>
+              </details>
 
-              </div>
+              <details className="admin-order-group">
+                <summary>
+                  <span>✅ PEDIDOS FINALIZADOS</span>
+                  <strong>
+                    {pedidos.filter(
+                      (pedido) => pedido.status === "realizado"
+                    ).length}
+                  </strong>
+                </summary>
 
-              <div>
+                <div className="admin-order-list">
+                  {pedidos
+                    .filter(
+                      (pedido) => pedido.status === "realizado"
+                    )
+                    .map((pedido) => (
+                      <article
+                        className="admin-order"
+                        key={pedido.id}
+                      >
+                        <div>
+                          <b>#{pedido.id}</b>
 
-                <strong>
-                  {Number(
-                    pedido.valor_total
-                  ).toLocaleString("pt-BR")}{" "}
-                  DZ
-                </strong>
+                          <span>
+                            {getGamertag(pedido)}
+                          </span>
 
-                <button
-                  onClick={() =>
-                    finalizarPedido(pedido)
-                  }
-                  disabled={
-                    pedido.status === "realizado"
-                  }
-                >
-                  {pedido.status === "realizado"
-                    ? "✓ Realizado"
-                    : "Marcar realizado"}
-                </button>
+                          <small>
+                            {pedido.tipo === "venda"
+                              ? `Venda de ${Number(
+                                  pedido.ervas_quantidade
+                                ).toLocaleString("pt-BR")} ervas`
+                              : `Compra: ${Number(
+                                  pedido.sementes_pacotes
+                                )} sementes + ${Number(
+                                  pedido.fertilizante_quantidade
+                                )} fertilizantes`}
+                          </small>
+                        </div>
 
-                <button
-                  type="button"
-                  className="delete-order"
-                  onClick={() =>
-                    excluirPedido(pedido)
-                  }
-                  title="Excluir pedido"
-                  aria-label="Excluir pedido"
-                >
-                  🗑️
-                </button>
+                        <div>
+                          <strong>
+                            {Number(
+                              pedido.valor_total
+                            ).toLocaleString("pt-BR")}{" "}
+                            DZ
+                          </strong>
 
-              </div>
+                          <button disabled>
+                            ✓ Realizado
+                          </button>
 
-            </article>
+                          <button
+                            type="button"
+                            className="delete-order"
+                            onClick={() =>
+                              excluirPedido(pedido)
+                            }
+                            title="Excluir pedido"
+                            aria-label="Excluir pedido"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                </div>
+              </details>
+            </>
+          )}
 
-          ))}
-
-      </section>
+        </section>
 
     </main>
   );

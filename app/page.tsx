@@ -5,6 +5,24 @@ import {useEffect,useMemo,useState} from "react";
 const HERB_PRICE=15000/50, SEED_PACK_PRICE=2000/4, FERT_PRICE=2500;
 
 export default function Home(){
+ const [lojaAberta,setLojaAberta]=useState(false);
+ const [categoriaLoja,setCategoriaLoja]=useState<string|null>(null);
+ const [itensLoja,setItensLoja]=useState<any[]>([]);
+ const [carregandoLoja,setCarregandoLoja]=useState(false);
+ const [erroLoja,setErroLoja]=useState("");
+ const [pesquisaLoja,setPesquisaLoja]=useState("");
+
+ const categoriasLoja = [
+   { id:"veiculos", image:"/loja/01-veiculos.jpg", title:"VEÍCULOS", text:"Veículos disponíveis para compra" },
+   { id:"construcao", image:"/loja/02-construcao.jpg", title:"CONSTRUÇÃO", text:"Materiais e itens para construção" },
+   { id:"armas-brancas", image:"/loja/03-armas-brancas.jpg", title:"ARMAS BRANCAS", text:"Equipamentos e lâminas disponíveis" },
+   { id:"armas", image:"/loja/04-armas.jpg", title:"ARMAS", text:"Equipamentos disponíveis para compra" },
+   { id:"explosivos", image:"/loja/05-explosivos.jpg", title:"EXPLOSIVOS", text:"Materiais explosivos disponíveis" },
+   { id:"municao", image:"/loja/06-municao.jpg", title:"MUNIÇÃO", text:"Munições disponíveis para compra" },
+   { id:"vestuario", image:"/loja/07-vestuario.jpg", title:"VESTUÁRIO", text:"Roupas e trajes disponíveis" },
+   { id:"pecas", image:"/loja/08-pecas.jpg", title:"PEÇAS", text:"Peças e componentes para veículos" },
+   { id:"especiais", image:"/loja/09-itens-exclusivos.jpg", title:"ITENS EXCLUSIVOS", text:"Itens especiais disponíveis por tempo limitado" },
+ ];
  const [mode,setMode]=useState<"home"|"sell"|"buy"|"orders"|"ranking">("home");
  const [gamertag,setGamertag]=useState(""); const [herbs,setHerbs]=useState(50);
  const [seeds,setSeeds]=useState(0); const [fert,setFert]=useState(0);
@@ -15,6 +33,38 @@ export default function Home(){
   const [ranking,setRanking]=useState<any[]>([]);
   useEffect(()=>{(async()=>{const {data}=await supabase.rpc("ranking_vendas");if(data)setRanking(data);})();},[]);
 
+
+ async function abrirCategoriaLoja(categoria:string){
+   setCategoriaLoja(categoria);
+   setPesquisaLoja("");
+   setItensLoja([]);
+   setErroLoja("");
+   setCarregandoLoja(true);
+
+   const { data, error } = await supabase
+     .from("itens")
+     .select("id, nome, categoria, valor")
+     .eq("categoria", categoria)
+     .order("id", { ascending:true });
+
+   if(error){
+     console.error("Erro ao carregar produtos da Loja:", error);
+     setErroLoja("Não foi possível carregar os produtos desta categoria.");
+     setItensLoja([]);
+   }else{
+     setItensLoja(data || []);
+   }
+
+   setCarregandoLoja(false);
+ }
+
+ function fecharLoja(){
+   setLojaAberta(false);
+   setCategoriaLoja(null);
+   setItensLoja([]);
+   setPesquisaLoja("");
+   setErroLoja("");
+ }
  async function submit(type:"venda"|"compra"){
    if(!gamertag.trim()) return setNotice("Informe sua Gamertag.");
    if(type==="venda" && herbs<=0) return setNotice("Informe a quantidade de ervas.");
@@ -115,7 +165,7 @@ export default function Home(){
     <b>ENTRAR →</b>
   </button>
 
-  <button className="actionCard actionStore" onClick={() => {window.location.href="/loja"}}>
+  <button className="actionCard actionStore" onClick={() => {setLojaAberta(true);setCategoriaLoja(null);setPesquisaLoja("");setNotice("")}}>
     <div className="actionVisual">
       <div className="visualCircle">🛒</div>
       <span className="visualLine"></span>
@@ -128,7 +178,7 @@ export default function Home(){
 </nav>
   <div className="wrap">{notice&&<div className="notice">{notice}</div>}
    {mode!=="home"&&<button className="backHome" onClick={()=>{setMode("home");setNotice("")}}>← INÍCIO</button>}
-   {mode==="home"&&<>
+   {mode==="home"&&!lojaAberta&&<>
 <section className="guide">
   <div className="guideIntro">
     <h2>GUIA DO DISTRITO ZERO</h2>
@@ -209,6 +259,107 @@ export default function Home(){
   </div>
 </section>
 </>}
+{lojaAberta&&
+<section className="lojaHome">
+
+  <div className="lojaHomeHeader">
+    <div>
+      <h2>🛒 LOJA DISTRITO ZERO</h2>
+      <p>Itens disponíveis para compra em DZ Coins.</p>
+    </div>
+    <button className="lojaClose" onClick={fecharLoja}>✕ FECHAR</button>
+  </div>
+
+  {!categoriaLoja ? (
+    <div className="lojaCategoryGrid">
+      {categoriasLoja.map((categoria) => (
+        <button
+          className="lojaCategoryCard"
+          key={categoria.id}
+          onClick={() => abrirCategoriaLoja(categoria.id)}
+        >
+          <img src={categoria.image} alt={categoria.title} />
+          <div className="lojaCategoryOverlay">
+            <h3>{categoria.title}</h3>
+            <p>{categoria.text}</p>
+            <b>VER ITENS →</b>
+          </div>
+        </button>
+      ))}
+    </div>
+  ) : (
+    <>
+      {(() => {
+        const categoriaAtual = categoriasLoja.find((categoria) => categoria.id === categoriaLoja);
+        const produtosFiltrados = itensLoja.filter((item) =>
+          String(item.nome || "").toLowerCase().includes(pesquisaLoja.toLowerCase())
+        );
+
+        return (
+          <>
+            <div className="lojaProductsHeader">
+              <div>
+                <button
+                  className="lojaBackCategories"
+                  onClick={() => {
+                    setCategoriaLoja(null);
+                    setItensLoja([]);
+                    setPesquisaLoja("");
+                    setErroLoja("");
+                  }}
+                >
+                  ← CATEGORIAS
+                </button>
+                <h2>{categoriaAtual?.title || categoriaLoja}</h2>
+                <p>{categoriaAtual?.text || "Itens disponíveis nesta categoria."}</p>
+              </div>
+
+              <input
+                className="lojaSearch"
+                type="text"
+                placeholder="Pesquisar produto..."
+                value={pesquisaLoja}
+                onChange={(e) => setPesquisaLoja(e.target.value)}
+              />
+            </div>
+
+            {carregandoLoja && <div className="lojaStatus">CARREGANDO PRODUTOS...</div>}
+
+            {erroLoja && <div className="lojaStatus lojaError">{erroLoja}</div>}
+
+            {!carregandoLoja && !erroLoja && produtosFiltrados.length === 0 && (
+              <div className="lojaStatus">
+                {pesquisaLoja
+                  ? "Nenhum produto encontrado para esta pesquisa."
+                  : "Nenhum produto cadastrado nesta categoria ainda."}
+              </div>
+            )}
+
+            {!carregandoLoja && !erroLoja && produtosFiltrados.length > 0 && (
+              <div className="lojaProductsGrid">
+                {produtosFiltrados.map((item) => (
+                  <div className="lojaProductCard" key={item.id}>
+                    <div className="lojaProductIcon">📦</div>
+                    <div className="lojaProductInfo">
+                      <h3>{item.nome}</h3>
+                      <small>ID #{item.id}</small>
+                    </div>
+                    <strong>
+                      {Number(item.valor).toLocaleString("pt-BR")} DZ Coins
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        );
+      })()}
+    </>
+  )}
+
+</section>
+}
+
 {mode==="ranking"&&
 <Panel title="🏆 RANKING DOS VENDEDORES">
 

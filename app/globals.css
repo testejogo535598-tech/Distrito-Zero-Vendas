@@ -3559,3 +3559,139 @@ body {
   }
 }
 
+
+/* AJUSTE VISUAL DA LOJA - CATEGORIAS E CABECALHO */
+
+.lojaCategoryCard img {
+  transform: scale(1.12);
+  transform-origin: center bottom;
+}
+
+.lojaCategoryCard {
+  overflow: hidden;
+}
+
+.lojaHomeHeader {
+  position: relative;
+}
+
+.lojaClose {
+  width: auto !important;
+  min-width: 0;
+  padding: 8px 12px !important;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.lojaProductsHeader {
+  align-items: flex-start;
+}
+
+.lojaBackCategories {
+  width: auto !important;
+  display: inline-block;
+  padding: 8px 12px !important;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 699px) {
+  .lojaClose {
+    align-self: flex-end;
+    width: auto !important;
+  }
+
+  .lojaProductsHeader {
+    gap: 10px;
+  }
+
+  .lojaBackCategories {
+    width: auto !important;
+    margin-bottom: 8px;
+  }
+}
+/* Ajustes finais da Loja */
+.lojaCategoryCard {
+  overflow: hidden;
+}
+
+.lojaCategoryCard img {
+  transform: scale(1.12);
+  transform-origin: center center;
+}
+
+/* Ações superiores da Loja */
+.lojaHomeHeader {
+  position: relative;
+}
+
+.lojaClose {
+  flex-shrink: 0;
+}
+
+/* Cabeçalho dos produtos */
+.lojaProductsHeader {
+  position: relative;
+}
+
+@media (min-width: 700px) {
+  .lojaProductsHeader > div:first-child {
+    position: relative;
+    flex: 1;
+  }
+
+  .lojaBackCategories {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 699px) {
+  .lojaHomeHeader {
+    padding-right: 0;
+  }
+
+  .lojaHomeHeader > div {
+    padding-right: 0;
+  }
+
+  .lojaHomeHeader .lojaClose {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: auto;
+  }
+
+  .lojaHomeHeader > div {
+    padding-right: 145px;
+  }
+
+  .lojaProductsHeader {
+    display: block;
+    margin-bottom: 18px;
+    padding-top: 0;
+  }
+
+  .lojaProductsHeader > div:first-child {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lojaBackCategories {
+    order: 0;
+    align-self: flex-start;
+    width: auto;
+    margin-bottom: 12px;
+  }
+
+  .lojaProductsHeader h2 {
+    order: 1;
+  }
+
+  .lojaProductsHeader p {
+    order: 2;
+  }
+
+  .lojaSearch {
+    margin-top: 14px;
+  }
+}

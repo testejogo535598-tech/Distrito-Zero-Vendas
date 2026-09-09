@@ -336,9 +336,9 @@ export default function Home(){
             )}
 
             {!carregandoLoja && !erroLoja && produtosFiltrados.length > 0 && (
-              <div className="lojaProductsGrid">
+              <div className="lojaProductsGrid" style={{ display: "flex", flexDirection: "column", gap: "7px", marginTop: "12px" }}>
                 {produtosFiltrados.map((item) => (
-                  <div className="lojaProductCard" key={item.id}>
+                  <div className="lojaProductCard" key={item.id} style={{ display: "flex", alignItems: "center", gap: "9px", padding: "7px 8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "9px", boxShadow: "0 2px 6px rgba(0,0,0,0.22)" }}>
                     <div className="lojaProductIcon">📦</div>
                     <div className="lojaProductInfo">
                       <h3>{item.nome}</h3>

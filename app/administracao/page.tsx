@@ -659,7 +659,7 @@ export default function Administracao() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "6px",
+                gap: "8px",
               }}
             >
               {itensFiltrados.length === 0 ? (
@@ -683,9 +683,10 @@ export default function Administracao() {
                       justifyContent: "space-between",
                       gap: "8px",
                       padding: "8px 10px",
-                      background: "rgba(255,255,255,0.025)",
-                      border: "1px solid rgba(255,255,255,0.07)",
+                      background: "rgba(255,255,255,0.06)",
+                      border: "1px solid rgba(255,255,255,0.18)",
                       borderRadius: "8px",
+                      boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
                     }}
                   >
                     <div style={{ minWidth: 0 }}>

@@ -3001,3 +3001,48 @@ body {
     font-size: 10px !important;
   }
 }
+
+/* ===== WHATSAPP — AGENDAMENTO DE ENTREGA ===== */
+
+.whatsappEntrega {
+  width: min(100%, 520px);
+  margin: 14px auto 18px;
+  padding: 14px;
+  box-sizing: border-box;
+  text-align: center;
+  border: 1px solid rgba(90, 145, 82, .55);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #182218, #0b100b);
+  box-shadow: 0 6px 18px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.04);
+}
+
+.whatsappEntrega p {
+  margin: 0 0 11px;
+  color: #d7ded4;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.whatsappEntrega button {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid rgba(92, 170, 82, .75);
+  border-radius: 9px;
+  background: linear-gradient(145deg, #315f2d, #1d3f1b);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+
+.whatsappEntrega button:hover {
+  background: linear-gradient(145deg, #3c7137, #245020);
+  transform: translateY(-1px);
+}
+
+.whatsappEntrega button:active {
+  transform: scale(.98);
+}

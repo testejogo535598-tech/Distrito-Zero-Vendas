@@ -39,6 +39,17 @@ export default function Home(){
  const [gamertag,setGamertag]=useState(""); const [herbs,setHerbs]=useState(50);
  const [seeds,setSeeds]=useState(0); const [fert,setFert]=useState(0);
  const [notice,setNotice]=useState("");
+ const [pedidoLojaId,setPedidoLojaId]=useState<number|null>(null);
+
+ const WHATSAPP_MERCADOR="5518996396879";
+
+ function falarComMercadorWhatsApp(){
+  if(!pedidoLojaId) return;
+
+  const mensagem=`Olá! Acabei de realizar um pedido no Distrito Zero. Pedido nº ${pedidoLojaId}. Gostaria de combinar o horário da entrega.`;
+
+  window.open(`https://wa.me/${WHATSAPP_MERCADOR}?text=${encodeURIComponent(mensagem)}`,"_blank");
+ }
  const herbValue=Math.max(0,herbs)*HERB_PRICE;
  const buyValue=seeds*SEED_PACK_PRICE+fert*FERT_PRICE;
  const [orders,setOrders]=useState<any[]>([]);
@@ -190,7 +201,7 @@ export default function Home(){
    setLojaAberta(false);
    setCategoriaLoja(null);
    setMode("home");
-   setNotice(`Pedido #${pedido.id} enviado com sucesso.`);
+   setPedidoLojaId(pedido.id); setNotice(`Pedido #${pedido.id} enviado com sucesso.`);
   }catch(error){
    console.error("Erro ao enviar pedido da Loja:",error);
    setNotice("Erro ao enviar pedido. Tente novamente.");
@@ -342,6 +353,10 @@ export default function Home(){
 
 </nav>
   <div className="wrap">{notice&&<div className="notice">{notice}</div>}
+  {pedidoLojaId&&<div className="whatsappEntrega">
+   <p>Entre em contato com o mercador pelo WhatsApp para combinar o melhor horário para sua entrega.</p>
+   <button type="button" onClick={falarComMercadorWhatsApp}>📱 FALAR COM O MERCADOR PELO WHATSAPP</button>
+  </div>}
    {mode!=="home"&&<button className="backHome" onClick={()=>{setMode("home");setNotice("")}}>← INÍCIO</button>}
    {mode==="home"&&!lojaAberta&&<>
 <section className="guide">

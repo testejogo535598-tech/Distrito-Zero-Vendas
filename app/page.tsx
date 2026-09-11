@@ -30,8 +30,8 @@ export default function Home(){
    { id:"armas-brancas", image:"/loja/03-armas-brancas.jpg", title:"ARMAS BRANCAS", text:"Equipamentos e lâminas disponíveis" },
    { id:"armas", image:"/loja/04-armas.jpg", title:"ARMAS", text:"Equipamentos disponíveis para compra" },
    { id:"explosivos", image:"/loja/05-explosivos.jpg", title:"EXPLOSIVOS", text:"Materiais explosivos disponíveis" },
-   { id:"municao", image:"/loja/06-municao.jpg", title:"MUNIÇÃO", text:"Munições disponíveis para compra" },
-   { id:"vestuario", image:"/loja/07-vestuario.jpg", title:"VESTUÁRIO", text:"Roupas e trajes disponíveis" },
+   { id:"municoes", image:"/loja/06-municao.jpg", title:"MUNIÇÃO", text:"Munições disponíveis para compra" },
+   { id:"vestimentas", image:"/loja/07-vestuario.jpg", title:"VESTUÁRIO", text:"Roupas e trajes disponíveis" },
    { id:"pecas", image:"/loja/08-pecas.jpg", title:"PEÇAS", text:"Peças e componentes para veículos" },
    { id:"especiais", image:"/loja/09-itens-exclusivos.jpg", title:"ITENS EXCLUSIVOS", text:"Itens especiais disponíveis por tempo limitado" },
  ];

@@ -2931,3 +2931,73 @@ body {
   }
 }
 
+
+/* ===== LOJA — CARRINHO ===== */
+
+.lojaHomeHeader {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  position: relative !important;
+}
+
+.lojaHomeHeader > div:first-child {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.lojaCartButton {
+  flex: 0 0 auto !important;
+  min-height: 38px !important;
+  padding: 0 13px !important;
+
+  border: 1px solid rgba(123,145,99,.55) !important;
+  border-radius: 10px !important;
+
+  background: linear-gradient(145deg, #26321f, #0b0f09) !important;
+  color: #fff !important;
+
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: .3px !important;
+
+  cursor: pointer !important;
+
+  box-shadow:
+    0 5px 14px rgba(0,0,0,.35),
+    inset 0 1px rgba(255,255,255,.06) !important;
+}
+
+.lojaCartButton:hover {
+  border-color: rgba(145,175,115,.8) !important;
+  transform: translateY(-1px) !important;
+}
+
+.lojaCartButton:active {
+  transform: scale(.96) !important;
+}
+
+.lojaCloseWrap {
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 760px) {
+  .lojaHomeHeader {
+    align-items: center !important;
+    gap: 7px !important;
+  }
+
+  .lojaCartButton {
+    min-height: 36px !important;
+    padding: 0 10px !important;
+    font-size: 10px !important;
+  }
+
+  .lojaClose {
+    min-width: 70px !important;
+    height: 36px !important;
+    padding: 0 10px !important;
+    font-size: 10px !important;
+  }
+}

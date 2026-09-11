@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
+type PedidoItem = {
+  id: number;
+  pedido_id: number;
+  produto_id: number;
+  nome_produto: string;
+  quantidade: number;
+  valor_unitario: number;
+  subtotal: number;
+};
+
 type Pedido = {
   id: number;
   jogador_id: number;
@@ -13,6 +23,7 @@ type Pedido = {
   valor_total: number;
   status: string;
   created_at: string;
+  pedido_itens?: PedidoItem[];
   jogadores?: {
     gamertag: string;
   } | {
@@ -115,7 +126,7 @@ export default function Administracao() {
   async function carregarPedidos() {
     setCarregando(true);
 
-    const { data, error } = await supabase
+    const { data: pedidosData, error: pedidosError } = await supabase
       .from("pedidos")
       .select(`
         id,
@@ -133,13 +144,42 @@ export default function Administracao() {
       `)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error(error);
+    if (pedidosError) {
+      console.error("Erro ao carregar pedidos:", pedidosError);
       setPedidos([]);
-    } else {
-      setPedidos((data || []) as Pedido[]);
+      setCarregando(false);
+      return;
     }
 
+    const ids = (pedidosData || []).map((pedido: any) => pedido.id);
+
+    const { data: itensData, error: itensError } = ids.length
+      ? await supabase
+          .from("pedido_itens")
+          .select(`
+            id,
+            pedido_id,
+            produto_id,
+            nome_produto,
+            quantidade,
+            valor_unitario,
+            subtotal
+          `)
+          .in("pedido_id", ids)
+      : { data: [], error: null };
+
+    if (itensError) {
+      console.error("Erro ao carregar itens dos pedidos:", itensError);
+    }
+
+    const pedidosComItens = (pedidosData || []).map((pedido: any) => ({
+      ...pedido,
+      pedido_itens: (itensData || []).filter(
+        (item: any) => item.pedido_id === pedido.id
+      ),
+    }));
+
+    setPedidos(pedidosComItens as Pedido[]);
     setCarregando(false);
   }
 
@@ -905,15 +945,40 @@ export default function Administracao() {
                   <small>
                     {pedido.tipo === "venda"
                       ? `Venda de ${Number(pedido.ervas_quantidade).toLocaleString("pt-BR")} ervas`
-                      : `Compra: ${Number(pedido.sementes_pacotes).toLocaleString("pt-BR")} sementes + ${Number(pedido.fertilizante_quantidade).toLocaleString("pt-BR")} fertilizantes`}
+                      : pedido.tipo === "loja" ? `Compra na Loja: ${pedido.pedido_itens?.length || 0} itens` : `Compra: ${Number(pedido.sementes_pacotes).toLocaleString("pt-BR")} sementes + ${Number(pedido.fertilizante_quantidade).toLocaleString("pt-BR")} fertilizantes`}
                   </small>
+
+                  {pedido.tipo === "loja" && pedido.pedido_itens?.length ? (
+                    <div style={{ marginTop: "6px", fontSize: "11px", opacity: 0.8 }}>
+                      {pedido.pedido_itens.map((item) => (
+                        <div key={item.id}>
+                          • {item.nome_produto} × {item.quantidade} — {Number(item.subtotal).toLocaleString("pt-BR")} DZ
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
 
                   {tipoPedidos === "finalizados" && pedidoAbertoId === pedido.id && (
                     <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid rgba(255,255,255,0.12)", fontSize: "12px", opacity: 0.8 }}>
                       <div><b>Jogador:</b> {getGamertag(pedido)}</div>
-                      <div><b>Tipo:</b> {pedido.tipo === "venda" ? "Venda de ervas" : "Compra de sementes e fertilizantes"}</div>
+                      <div><b>Tipo:</b> {pedido.tipo === "venda" ? "Venda de ervas" : pedido.tipo === "loja" ? "Compra na Loja" : "Compra de sementes e fertilizantes"}</div>
                       {pedido.tipo === "venda" ? (
                         <div><b>Quantidade:</b> {Number(pedido.ervas_quantidade).toLocaleString("pt-BR")} ervas</div>
+                      ) : pedido.tipo === "loja" ? (
+                        <div>
+                          <b>Itens:</b>
+                          {pedido.pedido_itens?.length ? (
+                            <div style={{ marginTop: "6px" }}>
+                              {pedido.pedido_itens.map((item) => (
+                                <div key={item.id}>
+                                  {item.nome_produto} × {item.quantidade} — {Number(item.subtotal).toLocaleString("pt-BR")} DZ
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div>Nenhum item registrado.</div>
+                          )}
+                        </div>
                       ) : (
                         <>
                           <div><b>Sementes:</b> {Number(pedido.sementes_pacotes).toLocaleString("pt-BR")} pacotes</div>

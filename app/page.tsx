@@ -11,6 +11,18 @@ export default function Home(){
  const [carregandoLoja,setCarregandoLoja]=useState(false);
  const [erroLoja,setErroLoja]=useState("");
  const [pesquisaLoja,setPesquisaLoja]=useState("");
+ type CarrinhoItem = {
+  id: number;
+  nome: string;
+  categoria: string;
+  valor: number;
+  quantidade: number;
+ };
+
+ const [carrinho,setCarrinho]=useState<CarrinhoItem[]>([]);
+ const [carrinhoAberto,setCarrinhoAberto]=useState(false);
+ const [enviandoCarrinho,setEnviandoCarrinho]=useState(false);
+
 
  const categoriasLoja = [
    { id:"veiculos", image:"/loja/01-veiculos.jpg", title:"VEÍCULOS", text:"Veículos disponíveis para compra" },
@@ -33,6 +45,159 @@ export default function Home(){
   const [ranking,setRanking]=useState<any[]>([]);
   useEffect(()=>{(async()=>{const {data}=await supabase.rpc("ranking_vendas");if(data)setRanking(data);})();},[]);
 
+
+ function adicionarAoCarrinho(item:any){
+  setCarrinho(prev => {
+   const existente = prev.find(p => p.id === item.id);
+
+   if(existente){
+    return prev.map(p =>
+     p.id === item.id
+      ? { ...p, quantidade: p.quantidade + 1 }
+      : p
+    );
+   }
+
+   return [
+    ...prev,
+    {
+     id: item.id,
+     nome: item.nome,
+     categoria: item.categoria,
+     valor: Number(item.valor),
+     quantidade: 1
+    }
+   ];
+  });
+
+  setNotice(`${item.nome} adicionado ao carrinho.`);
+ }
+
+ function atualizarQuantidade(id:number, valor:string){
+  const quantidade = Math.max(1, Number(valor) || 1);
+
+  setCarrinho(prev =>
+   prev.map(item =>
+    item.id === id
+     ? { ...item, quantidade }
+     : item
+   )
+  );
+ }
+
+ function removerDoCarrinho(id:number){
+  setCarrinho(prev =>
+   prev.filter(item => item.id !== id)
+  );
+ }
+
+ const totalCarrinho = carrinho.reduce(
+  (total,item) =>
+   total + item.valor * item.quantidade,
+  0
+ );
+
+ const quantidadeItensCarrinho = carrinho.reduce(
+  (total,item) =>
+   total + item.quantidade,
+  0
+ );
+
+ async function enviarCarrinho(){
+  if(carrinho.length===0){
+   return setNotice("Adicione pelo menos um produto ao carrinho.");
+  }
+
+  if(!gamertag.trim()){
+   return setNotice("Informe sua Gamertag.");
+  }
+
+  setEnviandoCarrinho(true);
+  setNotice("Enviando pedido...");
+
+  try{
+   const {data:playerData,error:playerError}=await supabase.rpc("obter_ou_criar_jogador",{
+    p_gamertag:gamertag.trim()
+   });
+
+   if(playerError || !playerData?.[0]){
+    console.error(playerError);
+    setNotice(playerError?.message || "Não foi possível identificar o jogador.");
+    return;
+   }
+
+   const player=playerData[0];
+
+   const {data:pedido,error:pedidoError}=await supabase
+    .from("pedidos")
+    .insert({
+     jogador_id:player.id,
+     tipo:"loja",
+     ervas_quantidade:0,
+     sementes_pacotes:0,
+     fertilizante_quantidade:0,
+     valor_total:totalCarrinho,
+     status:"processando"
+    })
+    .select("id")
+    .single();
+
+   if(pedidoError || !pedido){
+    setNotice(pedidoError?.message || "Não foi possível registrar o pedido.");
+    return;
+   }
+
+   const linhas=carrinho.map(item=>({
+    pedido_id:pedido.id,
+    produto_id:item.id,
+    nome_produto:item.nome,
+    quantidade:item.quantidade,
+    valor_unitario:item.valor,
+    subtotal:item.valor*item.quantidade
+   }));
+
+   const {error:itensError}=await supabase
+    .from("pedido_itens")
+    .insert(linhas);
+
+   if(itensError){
+    await supabase.from("pedidos").delete().eq("id",pedido.id);
+    setNotice(`Erro ao registrar os produtos do pedido: ${itensError.message}`);
+    return;
+   }
+
+   try{
+    const notificationResponse=await fetch("/api/notificar-pedido-loja",{
+     method:"POST",
+     headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({
+      id:pedido.id,
+      gamertag:gamertag.trim(),
+      items:carrinho,
+      total:totalCarrinho
+     })
+    });
+
+    if(!notificationResponse.ok){
+     console.error("Não foi possível enviar a notificação por e-mail da Loja.");
+    }
+   }catch(error){
+    console.error("Erro ao chamar a notificação por e-mail da Loja:",error);
+   }
+
+   setCarrinho([]);
+   setCarrinhoAberto(false);
+   setLojaAberta(false);
+   setCategoriaLoja(null);
+   setMode("home");
+   setNotice(`Pedido #${pedido.id} enviado com sucesso.`);
+  }catch(error){
+   console.error("Erro ao enviar pedido da Loja:",error);
+   setNotice("Erro ao enviar pedido. Tente novamente.");
+  }finally{
+   setEnviandoCarrinho(false);
+  }
+ }
 
  async function abrirCategoriaLoja(categoria:string){
    setCategoriaLoja(categoria);
@@ -267,6 +432,8 @@ export default function Home(){
       <h2>🛒 LOJA DISTRITO ZERO</h2>
       <p>Itens disponíveis para compra em DZ Coins.</p>
     </div>
+    <button className="lojaCartButton" type="button" onClick={() => setCarrinhoAberto(true)}>🛒 CARRINHO ({quantidadeItensCarrinho})</button>
+
     <div className="lojaCloseWrap"><button className="lojaClose" onClick={fecharLoja}>✕ FECHAR</button></div>
   </div>
 
@@ -338,7 +505,7 @@ export default function Home(){
             {!carregandoLoja && !erroLoja && produtosFiltrados.length > 0 && (
               <div className="lojaProductsGrid" style={{ display: "flex", flexDirection: "column", gap: "7px", marginTop: "12px" }}>
                 {produtosFiltrados.map((item) => (
-                  <div className="lojaProductCard" key={item.id} style={{ display: "flex", alignItems: "center", gap: "9px", padding: "7px 8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "9px", boxShadow: "0 2px 6px rgba(0,0,0,0.22)" }}>
+                  <div className="lojaProductCard" key={item.id} onClick={() => adicionarAoCarrinho(item)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); adicionarAoCarrinho(item); } }} style={{ display: "flex", alignItems: "center", gap: "9px", padding: "7px 8px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.14)", borderRadius: "9px", boxShadow: "0 2px 6px rgba(0,0,0,0.22)" }}>
                     <div className="lojaProductIcon">📦</div>
                     <div className="lojaProductInfo">
                       <h3>{item.nome}</h3>
@@ -357,6 +524,72 @@ export default function Home(){
     </>
   )}
 
+
+  {carrinhoAberto && (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", padding: "16px", overflowY: "auto" }}>
+      <div style={{ maxWidth: "520px", margin: "30px auto", background: "#111", border: "1px solid rgba(255,255,255,0.18)", borderRadius: "12px", padding: "16px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+          <h2 style={{ margin: 0 }}>🛒 CARRINHO</h2>
+          <button type="button" onClick={() => setCarrinhoAberto(false)}>✕</button>
+        </div>
+
+        {carrinho.length === 0 ? (
+          <p>Seu carrinho está vazio.</p>
+        ) : (
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {carrinho.map((item) => (
+                <div key={item.id} style={{ padding: "10px", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "9px" }}>
+                  <div style={{ fontWeight: 700 }}>{item.nome}</div>
+                  <div style={{ fontSize: "13px", opacity: 0.75 }}>{Number(item.valor).toLocaleString("pt-BR")} DZ Coins cada</div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
+                    <input
+                      type="number"
+                      min="1"
+                      inputMode="numeric"
+                      value={item.quantidade}
+                      onChange={(e) => atualizarQuantidade(item.id, e.target.value)}
+                      style={{ width: "70px", padding: "7px", borderRadius: "7px", border: "1px solid rgba(255,255,255,0.2)" }}
+                    />
+
+                    <span style={{ flex: 1 }}>
+                      {(item.valor * item.quantidade).toLocaleString("pt-BR")} DZ Coins
+                    </span>
+
+                    <button type="button" onClick={() => removerDoCarrinho(item.id)}>REMOVER</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.15)", fontWeight: 700 }}>
+              TOTAL: {totalCarrinho.toLocaleString("pt-BR")} DZ Coins
+            </div>
+
+            <label style={{ display: "block", marginTop: "14px" }}>
+              Gamertag
+              <input
+                value={gamertag}
+                onChange={(e) => setGamertag(e.target.value)}
+                placeholder="Nome no jogo"
+                style={{ display: "block", width: "100%", marginTop: "5px", padding: "9px", boxSizing: "border-box" }}
+              />
+            </label>
+
+            <button
+              type="button"
+              onClick={enviarCarrinho}
+              disabled={enviandoCarrinho}
+              style={{ width: "100%", marginTop: "14px", padding: "11px", fontWeight: 700 }}
+            >
+              {enviandoCarrinho ? "ENVIANDO..." : "ENVIAR PEDIDO"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )}
 </section>
 }
 
@@ -370,6 +603,9 @@ export default function Home(){
       <p>Ranking acumulado desde o início. Cada venda pode mudar a classificação.</p>
     </div>
   </div>
+
+
+
 
   {ranking[0]&&
     <div className="rank-champion">

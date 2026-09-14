@@ -38,21 +38,15 @@ type Item = {
   valor: number;
 };
 
-const categorias = [
-  { id: "armas", nome: "ARMAS", emoji: "🔫" },
-  { id: "armas-brancas", nome: "ARMAS BRANCAS", emoji: "🔪" },
-  { id: "comidas", nome: "COMIDAS", emoji: "🍖" },
-  { id: "construcao", nome: "CONSTRUÇÃO", emoji: "🏗️" },
-  { id: "explosivos", nome: "EXPLOSIVOS", emoji: "💣" },
-  { id: "ferramentas", nome: "FERRAMENTAS", emoji: "🔧" },
-  { id: "medicamentos", nome: "MEDICAMENTOS", emoji: "💊" },
-  { id: "mochilas", nome: "MOCHILAS", emoji: "🎒" },
-  { id: "municoes", nome: "MUNIÇÕES", emoji: "🔸" },
-  { id: "pecas", nome: "PEÇAS", emoji: "⚙️" },
-  { id: "veiculos", nome: "VEÍCULOS", emoji: "🚙" },
-  { id: "exclusivos", nome: "EXCLUSIVOS", emoji: "⭐" },
-  { id: "vestimentas", nome: "VESTIMENTAS", emoji: "👕" },
-];
+type Categoria = {
+  id: string;
+  nome: string;
+  emoji: string | null;
+  imagem: string | null;
+  descricao: string | null;
+  ordem: number;
+  ativa: boolean;
+};
 
 export default function Administracao() {
   useEffect(() => {
@@ -80,6 +74,15 @@ export default function Administracao() {
 
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [itens, setItens] = useState<Item[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  const [nomeCategoria, setNomeCategoria] = useState("");
+  const [idCategoria, setIdCategoria] = useState("");
+  const [emojiCategoria, setEmojiCategoria] = useState("📦");
+  const [imagemCategoria, setImagemCategoria] = useState("");
+  const [descricaoCategoria, setDescricaoCategoria] = useState("");
+  const [ordemCategoria, setOrdemCategoria] = useState("");
+  const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(null);
 
   const [carregando, setCarregando] = useState(true);
   const [carregandoItens, setCarregandoItens] = useState(true);
@@ -183,6 +186,22 @@ export default function Administracao() {
     setCarregando(false);
   }
 
+  async function carregarCategorias() {
+    const { data, error } = await supabase
+      .from("categorias")
+      .select("id, nome, emoji, imagem, descricao, ordem, ativa")
+      .eq("ativa", true)
+      .order("ordem", { ascending: true });
+
+    if (error) {
+      console.error("Erro ao carregar categorias:", error);
+      setCategorias([]);
+      return;
+    }
+
+    setCategorias((data || []) as Categoria[]);
+  }
+
   async function carregarItens() {
     setCarregandoItens(true);
 
@@ -199,6 +218,193 @@ export default function Administracao() {
     }
 
     setCarregandoItens(false);
+  }
+
+  function normalizarIdCategoria(valor: string) {
+    return valor
+      .normalize("NFD")
+      .replace(/[\\u0300-\\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function limparFormularioCategoria() {
+    setNomeCategoria("");
+    setIdCategoria("");
+    setEmojiCategoria("📦");
+    setImagemCategoria("");
+    setDescricaoCategoria("");
+    setOrdemCategoria("");
+    setEditandoCategoriaId(null);
+  }
+
+  async function adicionarCategoria() {
+    const nome = nomeCategoria.trim();
+    const id = normalizarIdCategoria(idCategoria || nome);
+    const emoji = emojiCategoria.trim() || "📦";
+    const imagem = imagemCategoria.trim() || null;
+    const descricao = descricaoCategoria.trim() || null;
+
+    if (!nome) {
+      alert("Digite o nome da categoria.");
+      return;
+    }
+
+    if (!id) {
+      alert("Digite um identificador válido para a categoria.");
+      return;
+    }
+
+    if (!/^[a-z0-9-]+$/.test(id)) {
+      alert("O identificador deve conter apenas letras minúsculas, números e hífen.");
+      return;
+    }
+
+    const ordemInformada = ordemCategoria.trim()
+      ? Number(ordemCategoria)
+      : categorias.length + 1;
+
+    if (Number.isNaN(ordemInformada) || ordemInformada < 0) {
+      alert("Digite uma ordem válida.");
+      return;
+    }
+
+    const { data: existente } = await supabase
+      .from("categorias")
+      .select("id")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (existente) {
+      alert("Já existe uma categoria com esse identificador.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("categorias")
+      .insert({
+        id,
+        nome,
+        emoji,
+        imagem,
+        descricao,
+        ordem: ordemInformada,
+        ativa: true,
+      });
+
+    if (error) {
+      console.error("Erro ao adicionar categoria:", error);
+      alert(
+        `Erro ao adicionar categoria.\\n\\n${error.message || "Erro desconhecido."}`
+      );
+      return;
+    }
+
+    limparFormularioCategoria();
+    await carregarCategorias();
+
+    alert("Categoria criada com sucesso!");
+  }
+
+  function iniciarEdicaoCategoria(categoria: Categoria) {
+    setEditandoCategoriaId(categoria.id);
+    setNomeCategoria(categoria.nome);
+    setIdCategoria(categoria.id);
+    setEmojiCategoria(categoria.emoji || "📦");
+    setImagemCategoria(categoria.imagem || "");
+    setDescricaoCategoria(categoria.descricao || "");
+    setOrdemCategoria(String(categoria.ordem));
+  }
+
+  function cancelarEdicaoCategoria() {
+    limparFormularioCategoria();
+  }
+
+  async function salvarEdicaoCategoria() {
+    if (!editandoCategoriaId) return;
+
+    const nome = nomeCategoria.trim();
+    const emoji = emojiCategoria.trim() || "📦";
+    const imagem = imagemCategoria.trim() || null;
+    const descricao = descricaoCategoria.trim() || null;
+
+    const ordemInformada = ordemCategoria.trim()
+      ? Number(ordemCategoria)
+      : 0;
+
+    if (!nome) {
+      alert("Digite o nome da categoria.");
+      return;
+    }
+
+    if (Number.isNaN(ordemInformada) || ordemInformada < 0) {
+      alert("Digite uma ordem válida.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("categorias")
+      .update({
+        nome,
+        emoji,
+        imagem,
+        descricao,
+        ordem: ordemInformada,
+      })
+      .eq("id", editandoCategoriaId);
+
+    if (error) {
+      console.error("Erro ao editar categoria:", error);
+      alert(
+        `Erro ao editar categoria.\\n\\n${error.message || "Erro desconhecido."}`
+      );
+      return;
+    }
+
+    limparFormularioCategoria();
+    await carregarCategorias();
+
+    alert("Categoria atualizada com sucesso!");
+  }
+
+  async function desativarCategoria(categoria: Categoria) {
+    const quantidade = itens.filter(
+      (item) => item.categoria === categoria.id
+    ).length;
+
+    const mensagem =
+      quantidade > 0
+        ? `A categoria "${categoria.nome}" possui ${quantidade} ${quantidade === 1 ? "item" : "itens"}.
+
+Ela será apenas desativada e continuará existindo no banco.
+
+Deseja continuar?`
+        : `Desativar a categoria "${categoria.nome}"?`;
+
+    const confirmar = window.confirm(mensagem);
+
+    if (!confirmar) return;
+
+    const { error } = await supabase
+      .from("categorias")
+      .update({ ativa: false })
+      .eq("id", categoria.id);
+
+    if (error) {
+      console.error("Erro ao desativar categoria:", error);
+      alert(
+        `Erro ao desativar categoria.\\n\\n${error.message || "Erro desconhecido."}`
+      );
+      return;
+    }
+
+    if (categoriaSelecionada === categoria.id) {
+      setCategoriaSelecionada(null);
+    }
+
+    await carregarCategorias();
   }
 
   async function adicionarProduto() {
@@ -383,6 +589,7 @@ export default function Administracao() {
   useEffect(() => {
     carregarPedidos();
     carregarItens();
+    carregarCategorias();
   }, []);
 
   function getGamertag(pedido: Pedido) {
@@ -395,7 +602,7 @@ export default function Administracao() {
     return pedido.jogadores.gamertag || "Jogador";
   }
 
-  function nomeCategoria(categoria: string) {
+  function obterNomeCategoria(categoria: string) {
     return (
       categorias.find((item) => item.id === categoria)?.nome ||
       categoria.toUpperCase()
@@ -469,6 +676,189 @@ export default function Administracao() {
           <strong>
             {Number(ervasVendidas).toLocaleString("pt-BR")}
           </strong>
+        </div>
+      </section>
+
+      <section className="panel">
+        <h2>🏷️ GERENCIAR CATEGORIAS</h2>
+
+        <p style={{ marginTop: "4px", opacity: 0.7 }}>
+          Crie, edite e organize as categorias exibidas na loja.
+        </p>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "10px",
+            marginTop: "16px",
+          }}
+        >
+          <input
+            value={nomeCategoria}
+            onChange={(e) => setNomeCategoria(e.target.value)}
+            placeholder="Nome da categoria"
+          />
+
+          <input
+            value={idCategoria}
+            onChange={(e) => setIdCategoria(e.target.value)}
+            placeholder="ID (ex: alimentos)"
+            disabled={editandoCategoriaId !== null}
+          />
+
+          <input
+            value={emojiCategoria}
+            onChange={(e) => setEmojiCategoria(e.target.value)}
+            placeholder="Emoji"
+          />
+
+          <input
+            value={imagemCategoria}
+            onChange={(e) => setImagemCategoria(e.target.value)}
+            placeholder="/loja/minha-categoria.jpg"
+          />
+
+          <input
+            value={ordemCategoria}
+            onChange={(e) => setOrdemCategoria(e.target.value)}
+            placeholder="Ordem (ex: 14)"
+            type="number"
+            min="0"
+          />
+
+          <input
+            value={descricaoCategoria}
+            onChange={(e) => setDescricaoCategoria(e.target.value)}
+            placeholder="Descrição da categoria"
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+            marginTop: "14px",
+          }}
+        >
+          {editandoCategoriaId === null ? (
+            <button
+              type="button"
+              onClick={adicionarCategoria}
+              style={{
+                padding: "10px 16px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              ➕ CRIAR CATEGORIA
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={salvarEdicaoCategoria}
+                style={{
+                  padding: "10px 16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                💾 SALVAR ALTERAÇÕES
+              </button>
+
+              <button
+                type="button"
+                onClick={cancelarEdicaoCategoria}
+                style={{
+                  padding: "10px 16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                ❌ CANCELAR
+              </button>
+            </>
+          )}
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gap: "10px",
+            marginTop: "20px",
+          }}
+        >
+          {categorias.map((categoria) => {
+            const quantidade = itens.filter(
+              (item) => item.categoria === categoria.id
+            ).length;
+
+            return (
+              <div
+                key={categoria.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                  flexWrap: "wrap",
+                  padding: "12px",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.03)",
+                }}
+              >
+                <div style={{ flex: 1, minWidth: "220px" }}>
+                  <strong>
+                    {categoria.emoji || "📦"} {categoria.nome}
+                  </strong>
+
+                  <div style={{ fontSize: "12px", opacity: 0.65, marginTop: "3px" }}>
+                    ID: {categoria.id} • Ordem: {categoria.ordem} • {quantidade}{" "}
+                    {quantidade === 1 ? "item" : "itens"}
+                  </div>
+
+                  {categoria.descricao && (
+                    <div style={{ fontSize: "12px", opacity: 0.7, marginTop: "4px" }}>
+                      {categoria.descricao}
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => iniciarEdicaoCategoria(categoria)}
+                    style={{
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✏️ EDITAR
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => desativarCategoria(categoria)}
+                    style={{
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    📴 DESATIVAR
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -547,7 +937,7 @@ export default function Administracao() {
             >
               <div>
                 <strong style={{ color: "#fff", fontSize: "15px" }}>
-                  {nomeCategoria(categoriaSelecionada)}
+                  {obterNomeCategoria(categoriaSelecionada)}
                 </strong>
                 <div style={{ fontSize: "11px", opacity: 0.6 }}>
                   {itensCategoria.length}{" "}

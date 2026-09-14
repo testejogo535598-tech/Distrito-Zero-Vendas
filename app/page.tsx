@@ -24,17 +24,7 @@ export default function Home(){
  const [enviandoCarrinho,setEnviandoCarrinho]=useState(false);
 
 
- const categoriasLoja = [
-   { id:"veiculos", image:"/loja/01-veiculos.jpg", title:"VEÍCULOS", text:"Veículos disponíveis para compra" },
-   { id:"construcao", image:"/loja/02-construcao.jpg", title:"CONSTRUÇÃO", text:"Materiais e itens para construção" },
-   { id:"armas-brancas", image:"/loja/03-armas-brancas.jpg", title:"ARMAS BRANCAS", text:"Equipamentos e lâminas disponíveis" },
-   { id:"armas", image:"/loja/04-armas.jpg", title:"ARMAS", text:"Equipamentos disponíveis para compra" },
-   { id:"explosivos", image:"/loja/05-explosivos.jpg", title:"EXPLOSIVOS", text:"Materiais explosivos disponíveis" },
-   { id:"municoes", image:"/loja/06-municao.jpg", title:"MUNIÇÃO", text:"Munições disponíveis para compra" },
-   { id:"vestimentas", image:"/loja/07-vestuario.jpg", title:"VESTUÁRIO", text:"Roupas e trajes disponíveis" },
-   { id:"pecas", image:"/loja/08-pecas.jpg", title:"PEÇAS", text:"Peças e componentes para veículos" },
-   { id:"especiais", image:"/loja/09-itens-exclusivos.jpg", title:"ITENS EXCLUSIVOS", text:"Itens especiais disponíveis por tempo limitado" },
- ];
+ const [categoriasLoja,setCategoriasLoja]=useState<any[]>([]);
  const [mode,setMode]=useState<"home"|"sell"|"buy"|"orders"|"ranking">("home");
  const [gamertag,setGamertag]=useState(""); const [herbs,setHerbs]=useState(50);
  const [seeds,setSeeds]=useState(0); const [fert,setFert]=useState(0);
@@ -55,6 +45,14 @@ export default function Home(){
  const [orders,setOrders]=useState<any[]>([]);
   const [ranking,setRanking]=useState<any[]>([]);
   useEffect(()=>{(async()=>{const {data}=await supabase.rpc("ranking_vendas");if(data)setRanking(data);})();},[]);
+  useEffect(()=>{
+   (async()=>{
+    const {data,error}=await supabase.from("categorias").select("id,nome,emoji,imagem,descricao,ordem,ativa").eq("ativa",true).order("ordem",{ascending:true});
+    if(error){console.error("Erro ao carregar categorias:",error);return;}
+    if(data)setCategoriasLoja(data);
+   })();
+  },[]);
+
 
 
  function adicionarAoCarrinho(item:any){
@@ -460,10 +458,10 @@ export default function Home(){
           key={categoria.id}
           onClick={() => abrirCategoriaLoja(categoria.id)}
         >
-          <img src={categoria.image} alt={categoria.title} />
+          <img src={categoria.imagem} alt={categoria.nome} />
           <div className="lojaCategoryOverlay">
-            <h3>{categoria.title}</h3>
-            <p>{categoria.text}</p>
+            <h3>{categoria.nome}</h3>
+            <p>{categoria.descricao}</p>
             <b>VER ITENS →</b>
           </div>
         </button>
@@ -492,8 +490,8 @@ export default function Home(){
                 >
                   ← CATEGORIAS
                 </button>
-                <h2>{categoriaAtual?.title || categoriaLoja}</h2>
-                <p>{categoriaAtual?.text || "Itens disponíveis nesta categoria."}</p>
+                <h2>{categoriaAtual?.nome || categoriaLoja}</h2>
+                <p>{categoriaAtual?.descricao || "Itens disponíveis nesta categoria."}</p>
               </div>
 
               <input

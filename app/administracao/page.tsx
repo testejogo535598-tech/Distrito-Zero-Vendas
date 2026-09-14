@@ -103,7 +103,7 @@ export default function Administracao() {
         `categoria-${crypto.randomUUID()}.${extensao}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("categorias")
+        .from("Categorias")
         .upload(nomeArquivo, arquivoImagemCategoria, {
           cacheControl: "3600",
           upsert: false,
@@ -120,7 +120,7 @@ export default function Administracao() {
       }
 
       const { data } = supabase.storage
-        .from("categorias")
+        .from("Categorias")
         .getPublicUrl(nomeArquivo);
 
       return data.publicUrl;
@@ -233,7 +233,7 @@ export default function Administracao() {
 
   async function carregarCategorias() {
     const { data, error } = await supabase
-      .from("categorias")
+      .from("Categorias")
       .select("id, nome, emoji, imagem, descricao, ordem, ativa")
       .eq("ativa", true)
       .order("ordem", { ascending: true });
@@ -317,7 +317,7 @@ export default function Administracao() {
     }
 
     const { data: existente } = await supabase
-      .from("categorias")
+      .from("Categorias")
       .select("id")
       .eq("id", id)
       .maybeSingle();
@@ -334,7 +334,7 @@ export default function Administracao() {
     }
 
     const { error } = await supabase
-      .from("categorias")
+      .from("Categorias")
       .insert({
         id,
         nome,
@@ -402,7 +402,7 @@ export default function Administracao() {
     }
 
     const { error } = await supabase
-      .from("categorias")
+      .from("Categorias")
       .update({
         nome,
         emoji,
@@ -445,7 +445,7 @@ Deseja continuar?`
     if (!confirmar) return;
 
     const { error } = await supabase
-      .from("categorias")
+      .from("Categorias")
       .update({ ativa: false })
       .eq("id", categoria.id);
 

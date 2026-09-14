@@ -80,9 +80,54 @@ export default function Administracao() {
   const [idCategoria, setIdCategoria] = useState("");
   const [emojiCategoria, setEmojiCategoria] = useState("📦");
   const [imagemCategoria, setImagemCategoria] = useState("");
+  const [arquivoImagemCategoria, setArquivoImagemCategoria] =
+    useState<File | null>(null);
+  const [enviandoImagemCategoria, setEnviandoImagemCategoria] =
+    useState(false);
   const [descricaoCategoria, setDescricaoCategoria] = useState("");
   const [ordemCategoria, setOrdemCategoria] = useState("");
   const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(null);
+
+  async function enviarImagemCategoria(): Promise<string | null> {
+    if (!arquivoImagemCategoria) {
+      return imagemCategoria.trim() || null;
+    }
+
+    setEnviandoImagemCategoria(true);
+
+    try {
+      const extensao =
+        arquivoImagemCategoria.name.split(".").pop()?.toLowerCase() || "webp";
+
+      const nomeArquivo =
+        `categoria-${crypto.randomUUID()}.${extensao}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("categorias")
+        .upload(nomeArquivo, arquivoImagemCategoria, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType:
+            arquivoImagemCategoria.type || "image/webp",
+        });
+
+      if (uploadError) {
+        console.error("Erro ao enviar imagem:", uploadError);
+        alert(
+          `Erro ao enviar a imagem.\\n\\n${uploadError.message || "Erro desconhecido."}`
+        );
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from("categorias")
+        .getPublicUrl(nomeArquivo);
+
+      return data.publicUrl;
+    } finally {
+      setEnviandoImagemCategoria(false);
+    }
+  }
 
   const [carregando, setCarregando] = useState(true);
   const [carregandoItens, setCarregandoItens] = useState(true);
@@ -235,6 +280,7 @@ export default function Administracao() {
     setIdCategoria("");
     setEmojiCategoria("📦");
     setImagemCategoria("");
+    setArquivoImagemCategoria(null);
     setDescricaoCategoria("");
     setOrdemCategoria("");
     setEditandoCategoriaId(null);
@@ -244,7 +290,6 @@ export default function Administracao() {
     const nome = nomeCategoria.trim();
     const id = normalizarIdCategoria(idCategoria || nome);
     const emoji = emojiCategoria.trim() || "📦";
-    const imagem = imagemCategoria.trim() || null;
     const descricao = descricaoCategoria.trim() || null;
 
     if (!nome) {
@@ -282,6 +327,12 @@ export default function Administracao() {
       return;
     }
 
+    const imagem = await enviarImagemCategoria();
+
+    if (arquivoImagemCategoria && !imagem) {
+      return;
+    }
+
     const { error } = await supabase
       .from("categorias")
       .insert({
@@ -314,6 +365,7 @@ export default function Administracao() {
     setIdCategoria(categoria.id);
     setEmojiCategoria(categoria.emoji || "📦");
     setImagemCategoria(categoria.imagem || "");
+    setArquivoImagemCategoria(null);
     setDescricaoCategoria(categoria.descricao || "");
     setOrdemCategoria(String(categoria.ordem));
   }
@@ -327,7 +379,6 @@ export default function Administracao() {
 
     const nome = nomeCategoria.trim();
     const emoji = emojiCategoria.trim() || "📦";
-    const imagem = imagemCategoria.trim() || null;
     const descricao = descricaoCategoria.trim() || null;
 
     const ordemInformada = ordemCategoria.trim()
@@ -341,6 +392,12 @@ export default function Administracao() {
 
     if (Number.isNaN(ordemInformada) || ordemInformada < 0) {
       alert("Digite uma ordem válida.");
+      return;
+    }
+
+    const imagem = await enviarImagemCategoria();
+
+    if (arquivoImagemCategoria && !imagem) {
       return;
     }
 
@@ -713,11 +770,37 @@ Deseja continuar?`
             placeholder="Emoji"
           />
 
-          <input
-            value={imagemCategoria}
-            onChange={(e) => setImagemCategoria(e.target.value)}
-            placeholder="/loja/minha-categoria.jpg"
-          />
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontSize: "13px", opacity: 0.8 }}>
+              Imagem da categoria
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const arquivo = e.target.files?.[0] || null;
+                setArquivoImagemCategoria(arquivo);
+
+                if (arquivo) {
+                  setImagemCategoria(URL.createObjectURL(arquivo));
+                }
+              }}
+            />
+
+            {imagemCategoria && (
+              <img
+                src={imagemCategoria}
+                alt="Prévia da categoria"
+                style={{
+                  width: "100%",
+                  maxHeight: "140px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+              />
+            )}
+          </div>
 
           <input
             value={ordemCategoria}

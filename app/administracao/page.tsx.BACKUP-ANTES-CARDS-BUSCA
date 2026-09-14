@@ -1,0 +1,603 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
+
+type Pedido = {
+  id: number;
+  jogador_id: number;
+  tipo: string;
+  ervas_quantidade: number;
+  sementes_pacotes: number;
+  fertilizante_quantidade: number;
+  valor_total: number;
+  status: string;
+  created_at: string;
+  jogadores?: {
+    gamertag: string;
+  } | {
+    gamertag: string;
+  }[];
+};
+
+type Item = {
+  id: number;
+  nome: string;
+  categoria: string;
+  valor: number;
+};
+
+const categorias = [
+  { id: "armas", nome: "ARMAS" },
+  { id: "armas-brancas", nome: "ARMAS BRANCAS" },
+  { id: "comidas", nome: "COMIDAS" },
+  { id: "construcao", nome: "CONSTRUÇÃO" },
+  { id: "explosivos", nome: "EXPLOSIVOS" },
+  { id: "ferramentas", nome: "FERRAMENTAS" },
+  { id: "medicamentos", nome: "MEDICAMENTOS" },
+  { id: "mochilas", nome: "MOCHILAS" },
+  { id: "municoes", nome: "MUNIÇÕES" },
+  { id: "pecas", nome: "PEÇAS" },
+  { id: "veiculos", nome: "VEÍCULOS" },
+  { id: "vestimentas", nome: "VESTIMENTAS" },
+];
+
+export default function Administracao() {
+
+  useEffect(() => {
+    async function verificarSessao() {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        window.location.replace("/administracao/login");
+        return;
+      }
+
+      const { data: adminAutorizado, error } = await supabase.rpc("is_admin");
+
+      if (error || !adminAutorizado) {
+        await supabase.auth.signOut();
+        window.location.replace("/administracao/login");
+      }
+    }
+
+    verificarSessao();
+  }, []);
+
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [itens, setItens] = useState<Item[]>([]);
+
+  const [carregando, setCarregando] = useState(true);
+  const [carregandoItens, setCarregandoItens] = useState(true);
+
+  const [nomeProduto, setNomeProduto] = useState("");
+  const [categoriaProduto, setCategoriaProduto] = useState("construcao");
+  const [precoProduto, setPrecoProduto] = useState("");
+
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+
+  const totalPedidos = pedidos.length;
+
+  const pendentes = pedidos.filter(
+    (pedido) => pedido.status !== "realizado"
+  ).length;
+
+  const realizados = pedidos.filter(
+    (pedido) => pedido.status === "realizado"
+  ).length;
+
+  const ervasVendidas = pedidos
+    .filter(
+      (pedido) =>
+        pedido.tipo === "venda" &&
+        pedido.status === "realizado"
+    )
+    .reduce(
+      (total, pedido) =>
+        total + Number(pedido.ervas_quantidade || 0),
+      0
+    );
+
+  async function carregarPedidos() {
+    setCarregando(true);
+
+    const { data, error } = await supabase
+      .from("pedidos")
+      .select(`
+        id,
+        jogador_id,
+        tipo,
+        ervas_quantidade,
+        sementes_pacotes,
+        fertilizante_quantidade,
+        valor_total,
+        status,
+        created_at,
+        jogadores (
+          gamertag
+        )
+      `)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(error);
+      setPedidos([]);
+    } else {
+      setPedidos((data || []) as Pedido[]);
+    }
+
+    setCarregando(false);
+  }
+
+  async function carregarItens() {
+    setCarregandoItens(true);
+
+    const { data, error } = await supabase
+      .from("itens")
+      .select("id, nome, categoria, valor")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error("Erro ao carregar produtos:", error);
+      setItens([]);
+    } else {
+      setItens((data || []) as Item[]);
+    }
+
+    setCarregandoItens(false);
+  }
+
+  async function adicionarProduto() {
+    const nome = nomeProduto.trim();
+    const valor = Number(precoProduto);
+
+    if (!nome) {
+      alert("Digite o nome do produto.");
+      return;
+    }
+
+    if (!precoProduto || Number.isNaN(valor) || valor < 0) {
+      alert("Digite um preço válido.");
+      return;
+    }
+
+    if (!categoriaProduto) {
+      alert("Selecione uma categoria.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("itens")
+      .insert({
+        nome,
+        categoria: categoriaProduto,
+        valor,
+      });
+
+    if (error) {
+      console.error("ERRO COMPLETO AO ADICIONAR PRODUTO:", error);
+      alert(
+        `Erro ao adicionar produto.\n\n${error.message || "Erro desconhecido."}`
+      );
+      return;
+    }
+
+    setNomeProduto("");
+    setCategoriaProduto("construcao");
+    setPrecoProduto("");
+
+    await carregarItens();
+  }
+
+  function iniciarEdicao(item: Item) {
+    setEditandoId(item.id);
+    setNomeProduto(item.nome);
+    setCategoriaProduto(item.categoria);
+    setPrecoProduto(String(item.valor));
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  function cancelarEdicao() {
+    setEditandoId(null);
+    setNomeProduto("");
+    setCategoriaProduto("construcao");
+    setPrecoProduto("");
+  }
+
+  async function salvarEdicao() {
+    if (editandoId === null) return;
+
+    const nome = nomeProduto.trim();
+    const valor = Number(precoProduto);
+
+    if (!nome) {
+      alert("Digite o nome do produto.");
+      return;
+    }
+
+    if (!precoProduto || Number.isNaN(valor) || valor < 0) {
+      alert("Digite um preço válido.");
+      return;
+    }
+
+    if (!categoriaProduto) {
+      alert("Selecione uma categoria.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("itens")
+      .update({
+        nome,
+        categoria: categoriaProduto,
+        valor,
+      })
+      .eq("id", editandoId);
+
+    if (error) {
+      console.error("Erro ao editar produto:", error);
+      alert(
+        `Erro ao editar produto.\n\n${error.message || "Erro desconhecido."}`
+      );
+      return;
+    }
+
+    cancelarEdicao();
+    await carregarItens();
+  }
+
+  async function excluirProduto(item: Item) {
+    const confirmar = window.confirm(
+      `Excluir o produto "${item.nome}"? Esta ação não pode ser desfeita.`
+    );
+
+    if (!confirmar) return;
+
+    const { error } = await supabase
+      .from("itens")
+      .delete()
+      .eq("id", item.id);
+
+    if (error) {
+      console.error("Erro ao excluir produto:", error);
+      alert(
+        `Erro ao excluir produto.\n\n${error.message || "Erro desconhecido."}`
+      );
+      return;
+    }
+
+    await carregarItens();
+  }
+
+  async function finalizarPedido(pedido: Pedido) {
+    if (pedido.status === "realizado") return;
+
+    const { data: pedidoRealizado, error } = await supabase
+      .rpc("admin_marcar_pedido_realizado", {
+        p_pedido_id: pedido.id,
+      });
+
+    if (error || !pedidoRealizado) {
+      alert("Erro ao finalizar o pedido.");
+      console.error(error);
+      return;
+    }
+
+    await carregarPedidos();
+  }
+
+  async function excluirPedido(pedido: Pedido) {
+    const confirmar = window.confirm(
+      `Excluir o pedido #${pedido.id}? Esta ação não pode ser desfeita.`
+    );
+
+    if (!confirmar) return;
+
+    const { error } = await supabase
+      .from("pedidos")
+      .delete()
+      .eq("id", pedido.id);
+
+    if (error) {
+      alert("Erro ao excluir o pedido.");
+      console.error(error);
+      return;
+    }
+
+    await carregarPedidos();
+  }
+
+  useEffect(() => {
+    carregarPedidos();
+    carregarItens();
+  }, []);
+
+  function getGamertag(pedido: Pedido) {
+    if (!pedido.jogadores) return "Jogador";
+
+    if (Array.isArray(pedido.jogadores)) {
+      return pedido.jogadores[0]?.gamertag || "Jogador";
+    }
+
+    return pedido.jogadores.gamertag || "Jogador";
+  }
+
+  function nomeCategoria(categoria: string) {
+    return (
+      categorias.find((item) => item.id === categoria)?.nome ||
+      categoria.toUpperCase()
+    );
+  }
+
+  return (
+    <main className="page">
+
+      <section className="hero admin-hero">
+        <p className="eyebrow">HOLOCAUSTO Z</p>
+
+        <h1>DISTRITO ZERO</h1>
+
+        <p className="muted">
+          Painel Administrativo
+        </p>
+      </section>
+
+      <section className="admin-stats">
+
+        <div className="admin-stat">
+          <span>📦</span>
+          <small>PEDIDOS TOTAIS</small>
+          <strong>{totalPedidos}</strong>
+        </div>
+
+        <div className="admin-stat">
+          <span>⏳</span>
+          <small>PENDENTES</small>
+          <strong>{pendentes}</strong>
+        </div>
+
+        <div className="admin-stat">
+          <span>✅</span>
+          <small>REALIZADOS</small>
+          <strong>{realizados}</strong>
+        </div>
+
+        <div className="admin-stat">
+          <span>🌿</span>
+          <small>ERVAS VENDIDAS</small>
+          <strong>
+            {Number(ervasVendidas).toLocaleString("pt-BR")}
+          </strong>
+        </div>
+
+      </section>
+
+      <section className="panel">
+
+        <h2>🛒 GERENCIAR LOJA</h2>
+
+        <p className="muted">
+          Adicione, edite ou exclua os produtos disponíveis na Loja.
+        </p>
+
+        <input
+          type="text"
+          placeholder="Nome do produto"
+          value={nomeProduto}
+          onChange={(e) => setNomeProduto(e.target.value)}
+        />
+
+        <select
+          value={categoriaProduto}
+          onChange={(e) => setCategoriaProduto(e.target.value)}
+        >
+          {categorias.map((categoria) => (
+            <option
+              key={categoria.id}
+              value={categoria.id}
+            >
+              {categoria.nome}
+            </option>
+          ))}
+        </select>
+
+        <input
+          type="number"
+          placeholder="Preço em DZ Coins"
+          value={precoProduto}
+          onChange={(e) => setPrecoProduto(e.target.value)}
+        />
+
+        {editandoId === null ? (
+          <button
+            type="button"
+            onClick={adicionarProduto}
+          >
+            ➕ ADICIONAR PRODUTO
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={salvarEdicao}
+            >
+              💾 SALVAR ALTERAÇÕES
+            </button>
+
+            <button
+              type="button"
+              onClick={cancelarEdicao}
+            >
+              ❌ CANCELAR
+            </button>
+          </>
+        )}
+
+        <div style={{ marginTop: "20px" }}>
+
+          {carregandoItens && (
+            <p className="muted">
+              Carregando produtos...
+            </p>
+          )}
+
+          {!carregandoItens && itens.length === 0 && (
+            <p className="muted">
+              Nenhum produto cadastrado.
+            </p>
+          )}
+
+          {!carregandoItens &&
+            itens.map((item) => (
+              <article
+                key={item.id}
+                className="admin-order"
+              >
+
+                <div>
+
+                  <b>
+                    {item.nome}
+                  </b>
+
+                  <span>
+                    {nomeCategoria(item.categoria)}
+                  </span>
+
+                  <small>
+                    ID: {item.id}
+                  </small>
+
+                </div>
+
+                <div>
+
+                  <strong>
+                    {Number(item.valor).toLocaleString("pt-BR")} DZ
+                  </strong>
+
+                  <button
+                    type="button"
+                    onClick={() => iniciarEdicao(item)}
+                  >
+                    ✏️
+                  </button>
+
+                  <button
+                    type="button"
+                    className="delete-order"
+                    onClick={() => excluirProduto(item)}
+                    title="Excluir produto"
+                    aria-label="Excluir produto"
+                  >
+                    🗑️
+                  </button>
+
+                </div>
+
+              </article>
+            ))}
+
+        </div>
+
+      </section>
+
+      <section className="panel">
+
+        <h2>📋 PEDIDOS</h2>
+
+        {carregando && (
+          <p className="muted">
+            Carregando pedidos...
+          </p>
+        )}
+
+        {!carregando && pedidos.length === 0 && (
+          <p className="muted">
+            Nenhum pedido encontrado.
+          </p>
+        )}
+
+        {[...pedidos]
+          .sort(
+            (a, b) =>
+              Number(a.status === "realizado") -
+              Number(b.status === "realizado")
+          )
+          .map((pedido) => (
+
+            <article
+              className="admin-order"
+              key={pedido.id}
+            >
+
+              <div>
+
+                <b>
+                  #{pedido.id}
+                </b>
+
+                <span>
+                  {getGamertag(pedido)}
+                </span>
+
+                <small>
+                  {pedido.tipo === "venda"
+                    ? `Venda de ${Number(
+                        pedido.ervas_quantidade
+                      ).toLocaleString("pt-BR")} ervas`
+                    : `Compra: ${Number(
+                        pedido.sementes_pacotes
+                      )} sementes + ${Number(
+                        pedido.fertilizante_quantidade
+                      )} fertilizantes`}
+                </small>
+
+              </div>
+
+              <div>
+
+                <strong>
+                  {Number(
+                    pedido.valor_total
+                  ).toLocaleString("pt-BR")} DZ
+                </strong>
+
+                <button
+                  onClick={() =>
+                    finalizarPedido(pedido)
+                  }
+                  disabled={
+                    pedido.status === "realizado"
+                  }
+                >
+                  {pedido.status === "realizado"
+                    ? "✓ Realizado"
+                    : "Marcar realizado"}
+                </button>
+
+                <button
+                  type="button"
+                  className="delete-order"
+                  onClick={() => excluirPedido(pedido)}
+                  title="Excluir pedido"
+                  aria-label="Excluir pedido"
+                >
+                  🗑️
+                </button>
+
+              </div>
+
+            </article>
+
+          ))}
+
+      </section>
+
+    </main>
+  );
+}

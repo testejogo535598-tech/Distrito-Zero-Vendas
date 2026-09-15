@@ -36,6 +36,7 @@ type Item = {
   nome: string;
   categoria: string;
   valor: number;
+  ordem: number;
 };
 
 type Categoria = {
@@ -131,6 +132,7 @@ export default function Administracao() {
 
   const [carregando, setCarregando] = useState(true);
   const [carregandoItens, setCarregandoItens] = useState(true);
+  const [salvandoOrdem, setSalvandoOrdem] = useState(false);
 
   const [nomeProduto, setNomeProduto] = useState("");
   const [categoriaProduto, setCategoriaProduto] =
@@ -247,13 +249,82 @@ export default function Administracao() {
     setCategorias((data || []) as Categoria[]);
   }
 
+  async function moverItem(itemId: number, direcao: "cima" | "baixo") {
+    if (salvandoOrdem || !categoriaSelecionada || buscaProduto.trim()) return;
+
+    const lista = itens
+      .filter((item) => item.categoria === categoriaSelecionada)
+      .sort((a, b) => {
+        const ordemA = Number(a.ordem ?? 0);
+        const ordemB = Number(b.ordem ?? 0);
+        return ordemA - ordemB || a.id - b.id;
+      });
+
+    const indiceAtual = lista.findIndex((item) => item.id === itemId);
+
+    if (indiceAtual === -1) return;
+
+    const novoIndice =
+      direcao === "cima"
+        ? indiceAtual - 1
+        : indiceAtual + 1;
+
+    if (novoIndice < 0 || novoIndice >= lista.length) return;
+
+    const novaLista = [...lista];
+    const itemAtual = novaLista[indiceAtual];
+
+    novaLista[indiceAtual] = novaLista[novoIndice];
+    novaLista[novoIndice] = itemAtual;
+
+    const novaOrdem = novaLista.map((item, index) => ({
+      ...item,
+      ordem: index + 1,
+    }));
+
+    setSalvandoOrdem(true);
+
+    try {
+      const resultados = await Promise.all(
+        novaOrdem.map((item) =>
+          supabase
+            .from("itens")
+            .update({ ordem: item.ordem })
+            .eq("id", item.id)
+        )
+      );
+
+      const erro = resultados.find((resultado) => resultado.error);
+
+      if (erro?.error) {
+        console.error("Erro ao salvar ordem dos produtos:", erro.error);
+        alert("Não foi possível salvar a nova ordem.");
+        return;
+      }
+
+      setItens((anteriores) =>
+        anteriores.map((item) => {
+          const atualizado = novaOrdem.find(
+            (novo) => novo.id === item.id
+          );
+
+          return atualizado || item;
+        })
+      );
+    } finally {
+      setSalvandoOrdem(false);
+    }
+  }
+
   async function carregarItens() {
     setCarregandoItens(true);
 
     const { data, error } = await supabase
       .from("itens")
-      .select("id, nome, categoria, valor")
-      .order("id", { ascending: false });
+      .select("id, nome, categoria, valor, ordem")
+      .order("categoria", { ascending: true })
+      .order("ordem", { ascending: true })
+      .order("id", { ascending: true });
 
     if (error) {
       console.error("Erro ao carregar produtos:", error);
@@ -667,9 +738,15 @@ Deseja continuar?`
   }
 
   const itensCategoria = categoriaSelecionada
-    ? itens.filter(
-        (item) => item.categoria === categoriaSelecionada
-      )
+    ? itens
+        .filter(
+          (item) => item.categoria === categoriaSelecionada
+        )
+        .sort((a, b) => {
+          const ordemA = Number(a.ordem ?? 0);
+          const ordemB = Number(b.ordem ?? 0);
+          return ordemA - ordemB || a.id - b.id;
+        })
     : [];
 
   const itensFiltrados = itensCategoria.filter((item) => {
@@ -1284,15 +1361,73 @@ Deseja continuar?`
                     <div
                       style={{
                         display: "flex",
+                        alignItems: "center",
                         gap: "5px",
                         flexShrink: 0,
+                        flexWrap: "wrap",
                       }}
                     >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "3px",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => moverItem(item.id, "cima")}
+                          disabled={
+                            salvandoOrdem ||
+                            !!buscaProduto.trim() ||
+                            itensCategoria.findIndex(
+                              (produto) => produto.id === item.id
+                            ) <= 0
+                          }
+                          aria-label={`Subir ${item.nome}`}
+                          style={{
+                            minWidth: "36px",
+                            minHeight: "32px",
+                            padding: "4px 7px",
+                            fontSize: "14px",
+                            lineHeight: 1,
+                            touchAction: "manipulation",
+                          }}
+                        >
+                          ▲
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => moverItem(item.id, "baixo")}
+                          disabled={
+                            salvandoOrdem ||
+                            !!buscaProduto.trim() ||
+                            itensCategoria.findIndex(
+                              (produto) => produto.id === item.id
+                            ) === itensCategoria.length - 1
+                          }
+                          aria-label={`Descer ${item.nome}`}
+                          style={{
+                            minWidth: "36px",
+                            minHeight: "32px",
+                            padding: "4px 7px",
+                            fontSize: "14px",
+                            lineHeight: 1,
+                            touchAction: "manipulation",
+                          }}
+                        >
+                          ▼
+                        </button>
+                      </div>
+
                       <button
                         onClick={() => iniciarEdicao(item)}
                         style={{
                           padding: "6px 8px",
                           fontSize: "10px",
+                          minHeight: "32px",
+                          touchAction: "manipulation",
                         }}
                       >
                         EDITAR
@@ -1303,6 +1438,8 @@ Deseja continuar?`
                         style={{
                           padding: "6px 8px",
                           fontSize: "10px",
+                          minHeight: "32px",
+                          touchAction: "manipulation",
                         }}
                       >
                         EXCLUIR

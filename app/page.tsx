@@ -213,9 +213,10 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 
    const { data, error } = await supabase
      .from("itens")
-     .select("id, nome, categoria, valor")
+     .select("id, nome, categoria, valor, ordem")
      .eq("categoria", categoria)
-     .order("id", { ascending:true });
+    .order("ordem", { ascending: true })
+    .order("id", { ascending: true });
 
    if(error){
      console.error("Erro ao carregar produtos da Loja:", error);

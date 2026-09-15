@@ -143,27 +143,19 @@ function abrirWhatsAppPedido(mensagem:string){
 
    const player=playerData[0];
 
-   const {data:pedido,error:pedidoError}=await supabase
-    .from("pedidos")
-    .insert({
-     jogador_id:player.id,
-     tipo:"loja",
-     ervas_quantidade:0,
-     sementes_pacotes:0,
-     fertilizante_quantidade:0,
-     valor_total:totalCarrinho,
-     status:"processando"
-    })
-    .select("id")
-    .single();
+   const {data:pedidoId,error:pedidoError}=await supabase.rpc("criar_pedido_loja",{
+    p_jogador_id:player.id,
+    p_valor_total:totalCarrinho
+   });
 
-   if(pedidoError || !pedido){
+   if(pedidoError || !pedidoId){
     setNotice(pedidoError?.message || "Não foi possível registrar o pedido.");
     return;
    }
 
+
    const linhas=carrinho.map(item=>({
-    pedido_id:pedido.id,
+    pedido_id:pedidoId,
     produto_id:item.id,
     nome_produto:item.nome,
     quantidade:item.quantidade,
@@ -176,7 +168,7 @@ function abrirWhatsAppPedido(mensagem:string){
     .insert(linhas);
 
    if(itensError){
-    await supabase.from("pedidos").delete().eq("id",pedido.id);
+    await supabase.from("pedidos").delete().eq("id",pedidoId);
     setNotice(`Erro ao registrar os produtos do pedido: ${itensError.message}`);
     return;
    }
@@ -185,7 +177,7 @@ function abrirWhatsAppPedido(mensagem:string){
 
    const mensagemWhatsApp=`🚨 NOVO PEDIDO — DISTRITO ZERO
 
-Pedido #${pedido.id}
+Pedido #${pedidoId}
 Gamertag: ${gamertag.trim()}
 
 🛒 PRODUTOS
@@ -203,7 +195,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
    setLojaAberta(false);
    setCategoriaLoja(null);
    setMode("home");
-   setPedidoLojaId(pedido.id); setNotice(`Pedido #${pedido.id} enviado com sucesso.`);
+   setPedidoLojaId(pedidoId); setNotice(`Pedido #${pedidoId} enviado com sucesso.`);
   }catch(error){
    console.error("Erro ao enviar pedido da Loja:",error);
    setNotice("Erro ao enviar pedido. Tente novamente.");

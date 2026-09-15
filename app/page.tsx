@@ -32,6 +32,12 @@ export default function Home(){
  const [pedidoLojaId,setPedidoLojaId]=useState<number|null>(null);
 
  const WHATSAPP_MERCADOR="5518996396879";
+function abrirWhatsAppPedido(mensagem:string){
+  window.open(
+    `https://wa.me/${WHATSAPP_MERCADOR}?text=${encodeURIComponent(mensagem)}`,
+    "_blank"
+  );
+}
 
  function falarComMercadorWhatsApp(){
   if(!pedidoLojaId) return;
@@ -175,25 +181,23 @@ export default function Home(){
     return;
    }
 
-   try{
-    const notificationResponse=await fetch("/api/notificar-pedido-loja",{
-     method:"POST",
-     headers:{"Content-Type":"application/json"},
-     body:JSON.stringify({
-      id:pedido.id,
-      gamertag:gamertag.trim(),
-      items:carrinho,
-      total:totalCarrinho
-     })
-    });
+   const itensMensagem=carrinho.map(item=>`• ${item.nome} — ${item.quantidade}x — ${(Number(item.valor)*Number(item.quantidade)).toLocaleString("pt-BR")} DZ Coins`).join("\n");
 
-    if(!notificationResponse.ok){
-     console.error("Não foi possível enviar a notificação por e-mail da Loja.");
-    }
-   }catch(error){
-    console.error("Erro ao chamar a notificação por e-mail da Loja:",error);
-   }
+   const mensagemWhatsApp=`🚨 NOVO PEDIDO — DISTRITO ZERO
 
+Pedido #${pedido.id}
+Gamertag: ${gamertag.trim()}
+
+🛒 PRODUTOS
+${itensMensagem}
+
+💰 VALOR TOTAL: ${Number(totalCarrinho).toLocaleString("pt-BR")} DZ Coins
+
+📦 Status: Processando
+
+Olá! Gostaria de combinar a entrega deste pedido.`;
+
+   abrirWhatsAppPedido(mensagemWhatsApp);
    setCarrinho([]);
    setCarrinhoAberto(false);
    setLojaAberta(false);
@@ -285,22 +289,24 @@ export default function Home(){
 
    setOrders(prev => [localOrder, ...prev]);
 
-   try {
-     const notificationResponse = await fetch("/api/notificar-pedido", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json"
-       },
-       body: JSON.stringify(localOrder)
-     });
+   const mensagemWhatsApp=`🚨 NOVO PEDIDO — DISTRITO ZERO
 
-     if (!notificationResponse.ok) {
-       console.error("Não foi possível enviar a notificação por e-mail.");
-     }
-   } catch (error) {
-     console.error("Erro ao chamar a notificação por e-mail:", error);
-   }
+Pedido #${localOrder.id}
+Gamertag: ${localOrder.gamertag}
 
+📋 TIPO: ${localOrder.type === "venda" ? "Venda de ervas" : "Compra"}
+
+🌿 Ervas: ${localOrder.herbs}
+🌱 Pacotes de sementes: ${localOrder.seeds}
+🧪 Fertilizante: ${localOrder.fert}
+
+💰 VALOR TOTAL: ${Number(localOrder.total).toLocaleString("pt-BR")} DZ Coins
+
+📦 Status: Processando
+
+Olá! Gostaria de combinar a entrega deste pedido.`;
+
+   abrirWhatsAppPedido(mensagemWhatsApp);
    setNotice(`Pedido #${localOrder.id} enviado com sucesso.`);
    setMode("home");
  }

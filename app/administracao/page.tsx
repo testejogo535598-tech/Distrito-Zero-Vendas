@@ -233,7 +233,7 @@ export default function Administracao() {
 
   async function carregarCategorias() {
     const { data, error } = await supabase
-      .from("Categorias")
+      .from("categorias")
       .select("id, nome, emoji, imagem, descricao, ordem, ativa")
       .eq("ativa", true)
       .order("ordem", { ascending: true });
@@ -268,7 +268,7 @@ export default function Administracao() {
   function normalizarIdCategoria(valor: string) {
     return valor
       .normalize("NFD")
-      .replace(/[\\u0300-\\u036f]/g, "")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
@@ -317,7 +317,7 @@ export default function Administracao() {
     }
 
     const { data: existente } = await supabase
-      .from("Categorias")
+      .from("categorias")
       .select("id")
       .eq("id", id)
       .maybeSingle();
@@ -334,7 +334,7 @@ export default function Administracao() {
     }
 
     const { error } = await supabase
-      .from("Categorias")
+      .from("categorias")
       .insert({
         id,
         nome,
@@ -402,7 +402,7 @@ export default function Administracao() {
     }
 
     const { error } = await supabase
-      .from("Categorias")
+      .from("categorias")
       .update({
         nome,
         emoji,
@@ -445,7 +445,7 @@ Deseja continuar?`
     if (!confirmar) return;
 
     const { error } = await supabase
-      .from("Categorias")
+      .from("categorias")
       .update({ ativa: false })
       .eq("id", categoria.id);
 
@@ -743,136 +743,190 @@ Deseja continuar?`
           Crie, edite e organize as categorias exibidas na loja.
         </p>
 
-        <div
+        <details
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "10px",
             marginTop: "16px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.03)",
+            overflow: "hidden",
           }}
         >
-          <input
-            value={nomeCategoria}
-            onChange={(e) => setNomeCategoria(e.target.value)}
-            placeholder="Nome da categoria"
-          />
+          <summary
+            style={{
+              padding: "14px 16px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              fontSize: "15px",
+            }}
+          >
+            ➕ ADICIONAR / EDITAR CATEGORIA
+          </summary>
 
-          <input
-            value={idCategoria}
-            onChange={(e) => setIdCategoria(e.target.value)}
-            placeholder="ID (ex: alimentos)"
-            disabled={editandoCategoriaId !== null}
-          />
-
-          <input
-            value={emojiCategoria}
-            onChange={(e) => setEmojiCategoria(e.target.value)}
-            placeholder="Emoji"
-          />
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            <label style={{ fontSize: "13px", opacity: 0.8 }}>
-              Imagem da categoria
-            </label>
-
+          <div
+            style={{
+              padding: "12px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "10px",
+              marginTop: "16px",
+            }}
+          >
             <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const arquivo = e.target.files?.[0] || null;
-                setArquivoImagemCategoria(arquivo);
-
-                if (arquivo) {
-                  setImagemCategoria(URL.createObjectURL(arquivo));
-                }
-              }}
+              value={nomeCategoria}
+              onChange={(e) => setNomeCategoria(e.target.value)}
+              placeholder="Nome da categoria"
             />
-
-            {imagemCategoria && (
-              <img
-                src={imagemCategoria}
-                alt="Prévia da categoria"
-                style={{
-                  width: "100%",
-                  maxHeight: "140px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
+  
+            <input
+              value={idCategoria}
+              onChange={(e) => setIdCategoria(e.target.value)}
+              placeholder="ID (ex: alimentos)"
+              disabled={editandoCategoriaId !== null}
+            />
+  
+            <input
+              value={emojiCategoria}
+              onChange={(e) => setEmojiCategoria(e.target.value)}
+              placeholder="Emoji"
+            />
+  
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <label style={{ fontSize: "13px", opacity: 0.8 }}>
+                Imagem da categoria
+              </label>
+  
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const arquivo = e.target.files?.[0] || null;
+                  setArquivoImagemCategoria(arquivo);
+  
+                  if (arquivo) {
+                    setImagemCategoria(URL.createObjectURL(arquivo));
+                  }
                 }}
               />
+  
+              {imagemCategoria && (
+                <img
+                  src={imagemCategoria}
+                  alt="Prévia da categoria"
+                  style={{
+                    width: "100%",
+                    maxHeight: "140px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
+              )}
+            </div>
+  
+            <input
+              value={ordemCategoria}
+              onChange={(e) => setOrdemCategoria(e.target.value)}
+              placeholder="Ordem (ex: 14)"
+              type="number"
+              min="0"
+            />
+  
+            <input
+              value={descricaoCategoria}
+              onChange={(e) => setDescricaoCategoria(e.target.value)}
+              placeholder="Descrição da categoria"
+            />
+          </div>
+  
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+              marginTop: "14px",
+            }}
+          >
+            {editandoCategoriaId === null ? (
+              <button
+                type="button"
+                onClick={adicionarCategoria}
+                style={{
+                  padding: "10px 16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                ➕ CRIAR CATEGORIA
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={salvarEdicaoCategoria}
+                  style={{
+                    padding: "10px 16px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  💾 SALVAR ALTERAÇÕES
+                </button>
+  
+                <button
+                  type="button"
+                  onClick={cancelarEdicaoCategoria}
+                  style={{
+                    padding: "10px 16px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                  }}
+                >
+                  ❌ CANCELAR
+                </button>
+              </>
             )}
           </div>
+  
+  
+          </div>
+        </details>
 
-          <input
-            value={ordemCategoria}
-            onChange={(e) => setOrdemCategoria(e.target.value)}
-            placeholder="Ordem (ex: 14)"
-            type="number"
-            min="0"
-          />
-
-          <input
-            value={descricaoCategoria}
-            onChange={(e) => setDescricaoCategoria(e.target.value)}
-            placeholder="Descrição da categoria"
-          />
-        </div>
-
-        <div
+        <details
           style={{
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-            marginTop: "14px",
-          }}
-        >
-          {editandoCategoriaId === null ? (
-            <button
-              type="button"
-              onClick={adicionarCategoria}
-              style={{
-                padding: "10px 16px",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              ➕ CRIAR CATEGORIA
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={salvarEdicaoCategoria}
-                style={{
-                  padding: "10px 16px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                💾 SALVAR ALTERAÇÕES
-              </button>
-
-              <button
-                type="button"
-                onClick={cancelarEdicaoCategoria}
-                style={{
-                  padding: "10px 16px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                ❌ CANCELAR
-              </button>
-            </>
-          )}
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gap: "10px",
             marginTop: "20px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.03)",
+            overflow: "hidden",
           }}
         >
+          <summary
+            style={{
+              padding: "14px 16px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              fontSize: "15px",
+            }}
+          >
+            📂 GERENCIAR CATEGORIAS
+            <span style={{ opacity: 0.6, marginLeft: "8px" }}>
+              ({categorias.length})
+            </span>
+          </summary>
+
+          <div
+            style={{
+              display: "grid",
+              gap: "10px",
+              padding: "12px",
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
           {categorias.map((categoria) => {
             const quantidade = itens.filter(
               (item) => item.categoria === categoria.id
@@ -942,7 +996,8 @@ Deseja continuar?`
               </div>
             );
           })}
-        </div>
+          </div>
+        </details>
       </section>
 
       <section className="panel">

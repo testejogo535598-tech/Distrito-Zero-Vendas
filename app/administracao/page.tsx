@@ -145,7 +145,21 @@ export default function Administracao() {
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState<string | null>(null);
 
+  const [buscaCategoria, setBuscaCategoria] = useState("");
+
   const [buscaProduto, setBuscaProduto] = useState("");
+
+  const [modoGerenciador, setModoGerenciador] =
+    useState<"adicionar" | "editar" | null>(null);
+
+  const [tipoGerenciador, setTipoGerenciador] =
+    useState<"categoria" | "item" | null>(null);
+
+    const [gerenciandoPosicoes, setGerenciandoPosicoes] =
+      useState(false);
+
+    const [categoriaPosicoesSelecionada, setCategoriaPosicoesSelecionada] =
+      useState<string | null>(null);
 
   const [tipoPedidos, setTipoPedidos] = useState<"abertos" | "finalizados">("abertos");
 
@@ -497,42 +511,52 @@ export default function Administracao() {
     alert("Categoria atualizada com sucesso!");
   }
 
-  async function desativarCategoria(categoria: Categoria) {
+  async function excluirCategoria(categoria: Categoria) {
     const quantidade = itens.filter(
       (item) => item.categoria === categoria.id
     ).length;
 
-    const mensagem =
-      quantidade > 0
-        ? `A categoria "${categoria.nome}" possui ${quantidade} ${quantidade === 1 ? "item" : "itens"}.
+    if (quantidade > 0) {
+      alert(
+        `Não é possível excluir a categoria "${categoria.nome}".
 
-Ela será apenas desativada e continuará existindo no banco.
+Ela possui ${quantidade} ${quantidade === 1 ? "produto vinculado" : "produtos vinculados"}.
 
-Deseja continuar?`
-        : `Desativar a categoria "${categoria.nome}"?`;
+Remova ou mova os produtos dessa categoria antes de excluí-la.`
+      );
+      return;
+    }
 
-    const confirmar = window.confirm(mensagem);
+    const confirmar = window.confirm(
+      `Excluir definitivamente a categoria "${categoria.nome}"?
+
+Essa ação não poderá ser desfeita.`
+    );
 
     if (!confirmar) return;
 
     const { error } = await supabase
       .from("categorias")
-      .update({ ativa: false })
+      .delete()
       .eq("id", categoria.id);
 
     if (error) {
-      console.error("Erro ao desativar categoria:", error);
+      console.error("Erro ao excluir categoria:", error);
       alert(
-        `Erro ao desativar categoria.\\n\\n${error.message || "Erro desconhecido."}`
+        `Erro ao excluir categoria.\\n\\n${error.message || "Erro desconhecido."}`
       );
       return;
     }
 
     if (categoriaSelecionada === categoria.id) {
       setCategoriaSelecionada(null);
+      setBuscaProduto("");
+      setEditandoId(null);
     }
 
     await carregarCategorias();
+
+    alert("Categoria excluída com sucesso!");
   }
 
   async function adicionarProduto() {
@@ -775,7 +799,34 @@ Deseja continuar?`
 
   return (
     <main className="page">
-      <section className="hero admin-hero">
+      <section
+        className="hero admin-hero"
+        style={{ position: "relative" }}
+      >
+        <button
+          type="button"
+          onClick={async () => {
+            await supabase.auth.signOut();
+            window.location.replace("/");
+          }}
+          aria-label="Sair"
+          title="Sair"
+          style={{
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            padding: "7px 10px",
+            borderRadius: "8px",
+            border: "1px solid rgba(255,255,255,0.12)",
+            background: "rgba(0,0,0,0.18)",
+            fontSize: "11px",
+            opacity: 0.8,
+            cursor: "pointer",
+          }}
+        >
+          🚪
+        </button>
+
         <p className="eyebrow">HOLOCAUSTO Z</p>
 
         <h1>DISTRITO ZERO</h1>
@@ -787,670 +838,12 @@ Deseja continuar?`
 
       <section className="admin-stats">
         <div className="admin-stat">
-          <span>📦</span>
-          <small>PEDIDOS TOTAIS</small>
-          <strong>{totalPedidos}</strong>
-        </div>
-
-        <div className="admin-stat">
-          <span>⏳</span>
-          <small>PENDENTES</small>
-          <strong>{pendentes}</strong>
-        </div>
-
-        <div className="admin-stat">
-          <span>✅</span>
-          <small>REALIZADOS</small>
-          <strong>{realizados}</strong>
-        </div>
-
-        <div className="admin-stat">
           <span>🌿</span>
           <small>ERVAS VENDIDAS</small>
           <strong>
             {Number(ervasVendidas).toLocaleString("pt-BR")}
           </strong>
         </div>
-      </section>
-
-      <section className="panel">
-        <h2>🏷️ GERENCIAR CATEGORIAS</h2>
-
-        <p style={{ marginTop: "4px", opacity: 0.7 }}>
-          Crie, edite e organize as categorias exibidas na loja.
-        </p>
-
-        <details
-          style={{
-            marginTop: "16px",
-            border: "1px solid rgba(255,255,255,0.12)",
-            borderRadius: "12px",
-            background: "rgba(255,255,255,0.03)",
-            overflow: "hidden",
-          }}
-        >
-          <summary
-            style={{
-              padding: "14px 16px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: "15px",
-            }}
-          >
-            ➕ ADICIONAR / EDITAR CATEGORIA
-          </summary>
-
-          <div
-            style={{
-              padding: "12px",
-              borderTop: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: "10px",
-              marginTop: "16px",
-            }}
-          >
-            <input
-              value={nomeCategoria}
-              onChange={(e) => setNomeCategoria(e.target.value)}
-              placeholder="Nome da categoria"
-            />
-  
-            <input
-              value={idCategoria}
-              onChange={(e) => setIdCategoria(e.target.value)}
-              placeholder="ID (ex: alimentos)"
-              disabled={editandoCategoriaId !== null}
-            />
-  
-            <input
-              value={emojiCategoria}
-              onChange={(e) => setEmojiCategoria(e.target.value)}
-              placeholder="Emoji"
-            />
-  
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <label style={{ fontSize: "13px", opacity: 0.8 }}>
-                Imagem da categoria
-              </label>
-  
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const arquivo = e.target.files?.[0] || null;
-                  setArquivoImagemCategoria(arquivo);
-  
-                  if (arquivo) {
-                    setImagemCategoria(URL.createObjectURL(arquivo));
-                  }
-                }}
-              />
-  
-              {imagemCategoria && (
-                <img
-                  src={imagemCategoria}
-                  alt="Prévia da categoria"
-                  style={{
-                    width: "100%",
-                    maxHeight: "140px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  }}
-                />
-              )}
-            </div>
-  
-            <input
-              value={ordemCategoria}
-              onChange={(e) => setOrdemCategoria(e.target.value)}
-              placeholder="Ordem (ex: 14)"
-              type="number"
-              min="0"
-            />
-  
-            <input
-              value={descricaoCategoria}
-              onChange={(e) => setDescricaoCategoria(e.target.value)}
-              placeholder="Descrição da categoria"
-            />
-          </div>
-  
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-              flexWrap: "wrap",
-              marginTop: "14px",
-            }}
-          >
-            {editandoCategoriaId === null ? (
-              <button
-                type="button"
-                onClick={adicionarCategoria}
-                style={{
-                  padding: "10px 16px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                }}
-              >
-                ➕ CRIAR CATEGORIA
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={salvarEdicaoCategoria}
-                  style={{
-                    padding: "10px 16px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  💾 SALVAR ALTERAÇÕES
-                </button>
-  
-                <button
-                  type="button"
-                  onClick={cancelarEdicaoCategoria}
-                  style={{
-                    padding: "10px 16px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                  }}
-                >
-                  ❌ CANCELAR
-                </button>
-              </>
-            )}
-          </div>
-  
-  
-          </div>
-        </details>
-
-        <details
-          style={{
-            marginTop: "20px",
-            border: "1px solid rgba(255,255,255,0.12)",
-            borderRadius: "12px",
-            background: "rgba(255,255,255,0.03)",
-            overflow: "hidden",
-          }}
-        >
-          <summary
-            style={{
-              padding: "14px 16px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: "15px",
-            }}
-          >
-            📂 GERENCIAR CATEGORIAS
-            <span style={{ opacity: 0.6, marginLeft: "8px" }}>
-              ({categorias.length})
-            </span>
-          </summary>
-
-          <div
-            style={{
-              display: "grid",
-              gap: "10px",
-              padding: "12px",
-              borderTop: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-          {categorias.map((categoria) => {
-            const quantidade = itens.filter(
-              (item) => item.categoria === categoria.id
-            ).length;
-
-            return (
-              <div
-                key={categoria.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                  padding: "12px",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: "10px",
-                  background: "rgba(255,255,255,0.03)",
-                }}
-              >
-                <div style={{ flex: 1, minWidth: "220px" }}>
-                  <strong>
-                    {categoria.emoji || "📦"} {categoria.nome}
-                  </strong>
-
-                  <div style={{ fontSize: "12px", opacity: 0.65, marginTop: "3px" }}>
-                    ID: {categoria.id} • Ordem: {categoria.ordem} • {quantidade}{" "}
-                    {quantidade === 1 ? "item" : "itens"}
-                  </div>
-
-                  {categoria.descricao && (
-                    <div style={{ fontSize: "12px", opacity: 0.7, marginTop: "4px" }}>
-                      {categoria.descricao}
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => iniciarEdicaoCategoria(categoria)}
-                    style={{
-                      padding: "8px 12px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    ✏️ EDITAR
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => desativarCategoria(categoria)}
-                    style={{
-                      padding: "8px 12px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    📴 DESATIVAR
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-          </div>
-        </details>
-      </section>
-
-      <section className="panel">
-        <h2>🛒 GERENCIAR LOJA</h2>
-        <p style={{ marginTop: "4px", opacity: 0.7 }}>
-          Selecione uma categoria para gerenciar os produtos.
-        </p>
-
-        {!categoriaSelecionada ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "7px",
-              marginTop: "16px",
-            }}
-          >
-            {categorias.map((categoria) => {
-              const quantidade = itens.filter(
-                (item) => item.categoria === categoria.id
-              ).length;
-
-              return (
-                <button
-                  key={categoria.id}
-                  onClick={() => {
-                    setCategoriaSelecionada(categoria.id);
-                    setCategoriaProduto(categoria.id);
-                    setBuscaProduto("");
-                    setEditandoId(null);
-                  }}
-                  style={{
-                    width: "100%",
-                    minHeight: "42px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "9px 14px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.10)",
-                    borderRadius: "9px",
-                    color: "#fff",
-                    textAlign: "left",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <strong style={{ color: "#fff" }}>
-                    {categoria.nome}
-                  </strong>
-
-                  <span
-                    style={{
-                      color: "#fff",
-                      opacity: 0.7,
-                      fontSize: "12px",
-                    }}
-                  >
-                    {quantidade} {quantidade === 1 ? "item" : "itens"}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <div style={{ marginTop: "14px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "10px",
-                marginBottom: "12px",
-              }}
-            >
-              <div>
-                <strong style={{ color: "#fff", fontSize: "15px" }}>
-                  {obterNomeCategoria(categoriaSelecionada)}
-                </strong>
-                <div style={{ fontSize: "11px", opacity: 0.6 }}>
-                  {itensCategoria.length}{" "}
-                  {itensCategoria.length === 1 ? "item" : "itens"}
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setCategoriaSelecionada(null);
-                  setBuscaProduto("");
-                  setEditandoId(null);
-                }}
-                style={{
-                  padding: "7px 10px",
-                  fontSize: "11px",
-                }}
-              >
-                ← CATEGORIAS
-              </button>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "7px",
-                padding: "10px",
-                marginBottom: "12px",
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "9px",
-              }}
-            >
-              <input
-                value={nomeProduto}
-                onChange={(e) => setNomeProduto(e.target.value)}
-                placeholder="Nome do produto"
-                style={{
-                  width: "100%",
-                  padding: "9px 10px",
-                  fontSize: "13px",
-                }}
-              />
-
-              <div
-                style={{
-                  display: "flex",
-                  gap: "7px",
-                }}
-              >
-                <input
-                  value={precoProduto}
-                  onChange={(e) => setPrecoProduto(e.target.value)}
-                  placeholder="Preço"
-                  type="number"
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    padding: "9px 10px",
-                    fontSize: "13px",
-                  }}
-                />
-
-                <select
-                  value={categoriaProduto}
-                  onChange={(e) => setCategoriaProduto(e.target.value)}
-                  style={{
-                    flex: 1.4,
-                    minWidth: 0,
-                    padding: "9px 8px",
-                    fontSize: "12px",
-                  }}
-                >
-                  {categorias.map((categoria) => (
-                    <option key={categoria.id} value={categoria.id}>
-                      {categoria.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: "flex", gap: "7px" }}>
-                {editandoId ? (
-                  <>
-                    <button
-                      onClick={salvarEdicao}
-                      style={{
-                        flex: 1,
-                        padding: "8px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      SALVAR ALTERAÇÃO
-                    </button>
-
-                    <button
-                      onClick={cancelarEdicao}
-                      style={{
-                        padding: "8px 10px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      CANCELAR
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={adicionarProduto}
-                    style={{
-                      width: "100%",
-                      padding: "8px",
-                      fontSize: "12px",
-                    }}
-                  >
-                    + ADICIONAR ITEM
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div style={{ position: "relative", marginBottom: "10px" }}>
-              <span
-                style={{
-                  position: "absolute",
-                  left: "10px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  opacity: 0.6,
-                  pointerEvents: "none",
-                }}
-              >
-                🔎
-              </span>
-
-              <input
-                value={buscaProduto}
-                onChange={(e) => setBuscaProduto(e.target.value)}
-                placeholder="Pesquisar nesta categoria..."
-                style={{
-                  width: "100%",
-                  padding: "9px 10px 9px 32px",
-                  fontSize: "12px",
-                }}
-              />
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-              }}
-            >
-              {itensFiltrados.length === 0 ? (
-                <div
-                  style={{
-                    padding: "16px 10px",
-                    textAlign: "center",
-                    opacity: 0.6,
-                    fontSize: "12px",
-                  }}
-                >
-                  Nenhum produto encontrado.
-                </div>
-              ) : (
-                itensFiltrados.map((item) => (
-                  <article
-                    key={item.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "8px",
-                      padding: "8px 10px",
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                      borderRadius: "8px",
-                      boxShadow: "0 2px 5px rgba(0,0,0,0.25)",
-                    }}
-                  >
-                    <div style={{ minWidth: 0 }}>
-                      <strong
-                        style={{
-                          display: "block",
-                          color: "#fff",
-                          fontSize: "12px",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {item.nome}
-                      </strong>
-
-                      <span
-                        style={{
-                          fontSize: "10px",
-                          opacity: 0.55,
-                        }}
-                      >
-                        ID {item.id} • {item.valor} DZ Coins
-                      </span>
-                    </div>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        flexShrink: 0,
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "3px",
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => moverItem(item.id, "cima")}
-                          disabled={
-                            salvandoOrdem ||
-                            !!buscaProduto.trim() ||
-                            itensCategoria.findIndex(
-                              (produto) => produto.id === item.id
-                            ) <= 0
-                          }
-                          aria-label={`Subir ${item.nome}`}
-                          style={{
-                            minWidth: "36px",
-                            minHeight: "32px",
-                            padding: "4px 7px",
-                            fontSize: "14px",
-                            lineHeight: 1,
-                            touchAction: "manipulation",
-                          }}
-                        >
-                          ▲
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => moverItem(item.id, "baixo")}
-                          disabled={
-                            salvandoOrdem ||
-                            !!buscaProduto.trim() ||
-                            itensCategoria.findIndex(
-                              (produto) => produto.id === item.id
-                            ) === itensCategoria.length - 1
-                          }
-                          aria-label={`Descer ${item.nome}`}
-                          style={{
-                            minWidth: "36px",
-                            minHeight: "32px",
-                            padding: "4px 7px",
-                            fontSize: "14px",
-                            lineHeight: 1,
-                            touchAction: "manipulation",
-                          }}
-                        >
-                          ▼
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => iniciarEdicao(item)}
-                        style={{
-                          padding: "6px 8px",
-                          fontSize: "10px",
-                          minHeight: "32px",
-                          touchAction: "manipulation",
-                        }}
-                      >
-                        EDITAR
-                      </button>
-
-                      <button
-                        onClick={() => excluirProduto(item)}
-                        style={{
-                          padding: "6px 8px",
-                          fontSize: "10px",
-                          minHeight: "32px",
-                          touchAction: "manipulation",
-                        }}
-                      >
-                        EXCLUIR
-                      </button>
-                    </div>
-                  </article>
-                ))
-              )}
-            </div>
-          </div>
-        )}
       </section>
 
       <section className="panel">
@@ -1686,6 +1079,910 @@ Deseja continuar?`
             ))}
         </div>
       </section>
-    </main>
-  );
+
+      <section className="panel">
+        <h2>🏷️ GERENCIADOR DE CATEGORIAS E ITENS</h2>
+
+        <p style={{ marginTop: "4px", opacity: 0.7 }}>
+          Gerencie categorias e itens da loja em um único lugar.
+        </p>
+
+        {!modoGerenciador ? (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "8px",
+              marginTop: "14px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                limparFormularioCategoria();
+                cancelarEdicao();
+                setCategoriaSelecionada(null);
+                setBuscaProduto("");
+                setModoGerenciador("adicionar");
+                setTipoGerenciador(null);
+              }}
+              style={{
+                padding: "12px 8px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              ➕ ADICIONAR
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                limparFormularioCategoria();
+                cancelarEdicao();
+                setCategoriaSelecionada(null);
+                setBuscaProduto("");
+                setModoGerenciador("editar");
+                setTipoGerenciador(null);
+              }}
+              style={{
+                padding: "12px 8px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              ✏️ EDITAR
+            </button>
+          </div>
+        ) : (
+          <>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "8px",
+                marginTop: "14px",
+                marginBottom: "10px",
+              }}
+            >
+              <strong>
+                {modoGerenciador === "adicionar"
+                  ? "➕ ADICIONAR"
+                  : "✏️ EDITAR"}
+              </strong>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setModoGerenciador(null);
+                  setTipoGerenciador(null);
+                  limparFormularioCategoria();
+                  cancelarEdicao();
+                  setCategoriaSelecionada(null);
+                  setBuscaProduto("");
+                }}
+                style={{
+                  padding: "6px 9px",
+                  fontSize: "11px",
+                  cursor: "pointer",
+                }}
+              >
+                ← VOLTAR
+              </button>
+            </div>
+
+            {!tipoGerenciador ? (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: "8px",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    limparFormularioCategoria();
+                    setCategoriaSelecionada(null);
+                    setBuscaProduto("");
+                    setTipoGerenciador("categoria");
+                  }}
+                  style={{
+                    padding: "12px 8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  📂 CATEGORIA
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    cancelarEdicao();
+                    setCategoriaSelecionada(null);
+                    setBuscaProduto("");
+                    setTipoGerenciador("item");
+                  }}
+                  style={{
+                    padding: "12px 8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  📦 ITEM
+                </button>
+              </div>
+            ) : tipoGerenciador === "categoria" ? (
+              <div
+                style={{
+                  marginTop: "10px",
+                  padding: "12px",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.03)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "8px",
+                    marginBottom: "12px",
+                  }}
+                >
+                  <strong>📂 {modoGerenciador === "adicionar" ? "ADICIONAR" : "EDITAR"} CATEGORIA</strong>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTipoGerenciador(null);
+                      limparFormularioCategoria();
+                    }}
+                    style={{
+                      padding: "6px 9px",
+                      fontSize: "11px",
+                    }}
+                  >
+                    ← VOLTAR
+                  </button>
+                </div>
+
+                {modoGerenciador === "editar" && !editandoCategoriaId ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "7px",
+                    }}
+                  >
+                    <input
+                      value={buscaCategoria}
+                      onChange={(e) => setBuscaCategoria(e.target.value)}
+                      placeholder="🔎 Pesquisar categoria"
+                    />
+
+                    {buscaCategoria.trim() && (() => {
+                      const busca = buscaCategoria.trim().toLowerCase();
+
+                      const resultados = categorias
+                        .filter((categoria) =>
+                          categoria.nome.toLowerCase().includes(busca) ||
+                          categoria.id.toLowerCase().includes(busca)
+                        )
+                        .sort((a, b) =>
+                          a.nome.localeCompare(b.nome, "pt-BR")
+                        )
+                        .slice(0, 10);
+
+                      if (resultados.length === 0) {
+                        return (
+                          <p style={{ marginTop: "8px", opacity: 0.7 }}>
+                            Nenhuma categoria encontrada.
+                          </p>
+                        );
+                      }
+
+                      return (
+                        <div
+                          style={{
+                            display: "grid",
+                            gap: "6px",
+                            marginTop: "8px",
+                          }}
+                        >
+                          {resultados.map((categoria) => (
+                            <button
+                              key={categoria.id}
+                              type="button"
+                              onClick={() => {
+                                setBuscaCategoria("");
+                                iniciarEdicaoCategoria(categoria);
+                              }}
+                              style={{
+                                width: "100%",
+                                textAlign: "left",
+                                padding: "10px",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <strong>
+                                {categoria.emoji || "📦"} {categoria.nome}
+                              </strong>
+                              <span
+                                style={{
+                                  marginLeft: "6px",
+                                  fontSize: "11px",
+                                  opacity: 0.65,
+                                }}
+                              >
+                                {categoria.id}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })()}
+
+                    <p style={{ fontSize: "11px", opacity: 0.6, margin: 0 }}>
+                      Selecione uma categoria para editar.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        display: "grid",
+                        gap: "9px",
+                      }}
+                    >
+                      <input
+                        value={nomeCategoria}
+                        onChange={(e) => setNomeCategoria(e.target.value)}
+                        placeholder="Nome da categoria"
+                      />
+
+                      <input
+                        value={idCategoria}
+                        onChange={(e) => setIdCategoria(e.target.value)}
+                        placeholder="ID (ex: alimentos)"
+                        disabled={editandoCategoriaId !== null}
+                      />
+
+                      <input
+                        value={emojiCategoria}
+                        onChange={(e) => setEmojiCategoria(e.target.value)}
+                        placeholder="Emoji"
+                      />
+
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "6px",
+                        }}
+                      >
+                        <label style={{ fontSize: "12px", opacity: 0.8 }}>
+                          Imagem da categoria
+                        </label>
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const arquivo = e.target.files?.[0] || null;
+                            setArquivoImagemCategoria(arquivo);
+
+                            if (arquivo) {
+                              setImagemCategoria(
+                                URL.createObjectURL(arquivo)
+                              );
+                            }
+                          }}
+                        />
+
+                        {imagemCategoria && (
+                          <img
+                            src={imagemCategoria}
+                            alt="Prévia da categoria"
+                            style={{
+                              width: "100%",
+                              maxHeight: "140px",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                            }}
+                          />
+                        )}
+                      </div>
+
+                      <input
+                        value={ordemCategoria}
+                        onChange={(e) => setOrdemCategoria(e.target.value)}
+                        placeholder="Ordem"
+                        type="number"
+                        min="0"
+                      />
+
+                      <input
+                        value={descricaoCategoria}
+                        onChange={(e) => setDescricaoCategoria(e.target.value)}
+                        placeholder="Descrição da categoria"
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        flexWrap: "wrap",
+                        marginTop: "12px",
+                      }}
+                    >
+                      {modoGerenciador === "adicionar" ? (
+                        <button
+                          type="button"
+                          onClick={adicionarCategoria}
+                          disabled={enviandoImagemCategoria}
+                          style={{
+                            flex: 1,
+                            padding: "10px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {enviandoImagemCategoria
+                            ? "ENVIANDO..."
+                            : "➕ CRIAR CATEGORIA"}
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={salvarEdicaoCategoria}
+                            disabled={enviandoImagemCategoria}
+                            style={{
+                              flex: 1,
+                              padding: "10px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {enviandoImagemCategoria
+                              ? "SALVANDO..."
+                              : "💾 SALVAR"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              cancelarEdicaoCategoria();
+                              setTipoGerenciador(null);
+                            }}
+                            style={{
+                              padding: "10px",
+                            }}
+                          >
+                            CANCELAR
+                          </button>
+
+                          {editandoCategoriaId && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const categoria = categorias.find(
+                                  (item) => item.id === editandoCategoriaId
+                                );
+
+                                if (categoria) {
+                                  excluirCategoria(categoria);
+                                }
+                              }}
+                              style={{
+                                padding: "10px",
+                              }}
+                            >
+                              🗑️ EXCLUIR
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div
+                style={{
+                  marginTop: "10px",
+                  padding: "12px",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  borderRadius: "10px",
+                  background: "rgba(255,255,255,0.03)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "8px",
+                    marginBottom: "12px",
+                  }}
+                >
+                  <strong>
+                    📦 {modoGerenciador === "adicionar"
+                      ? "ADICIONAR ITEM"
+                      : "EDITAR ITEM"}
+                  </strong>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTipoGerenciador(null);
+                      cancelarEdicao();
+                      setCategoriaSelecionada(null);
+                      setBuscaProduto("");
+                    }}
+                    style={{
+                      padding: "6px 9px",
+                      fontSize: "11px",
+                    }}
+                  >
+                    ← VOLTAR
+                  </button>
+                </div>
+
+                {modoGerenciador === "editar" && editandoId === null ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "8px",
+                    }}
+                  >
+                    <input
+                      value={buscaProduto}
+                      onChange={(e) => setBuscaProduto(e.target.value)}
+                      placeholder="🔎 Pesquisar item por nome ou ID"
+                    />
+
+                    {buscaProduto.trim() && (() => {
+                      const busca = buscaProduto.trim().toLowerCase();
+
+                      const resultados = itens
+                        .filter((item) =>
+                          item.nome.toLowerCase().includes(busca) ||
+                          String(item.id).includes(busca)
+                        )
+                        .sort((a, b) =>
+                          a.nome.localeCompare(b.nome, "pt-BR")
+                        )
+                        .slice(0, 10);
+
+                      if (resultados.length === 0) {
+                        return (
+                          <p style={{ marginTop: "8px", opacity: 0.7 }}>
+                            Nenhum item encontrado.
+                          </p>
+                        );
+                      }
+
+                      return (
+                        <div
+                          style={{
+                            display: "grid",
+                            gap: "6px",
+                            marginTop: "8px",
+                          }}
+                        >
+                          {resultados.map((item) => (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onClick={() => {
+                                setCategoriaSelecionada(item.categoria);
+                                setBuscaProduto("");
+                                iniciarEdicao(item);
+                              }}
+                              style={{
+                                width: "100%",
+                                textAlign: "left",
+                                padding: "10px",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <strong>{item.nome}</strong>
+                              <span
+                                style={{
+                                  marginLeft: "6px",
+                                  fontSize: "11px",
+                                  opacity: 0.65,
+                                }}
+                              >
+                                #{item.id} · {obterNomeCategoria(item.categoria)}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      );
+                    })()}
+
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        opacity: 0.6,
+                        margin: 0,
+                      }}
+                    >
+                      Pesquise pelo nome ou ID e selecione o item para editar.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                      <input
+                        value={nomeProduto}
+                        onChange={(e) => setNomeProduto(e.target.value)}
+                        placeholder="Nome do item"
+                      />
+
+                      <input
+                        value={precoProduto}
+                        onChange={(e) => setPrecoProduto(e.target.value)}
+                        placeholder="Valor"
+                        type="number"
+                        min="0"
+                      />
+
+
+
+                      <select
+                        value={categoriaProduto}
+                        onChange={(e) => setCategoriaProduto(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "9px",
+                        }}
+                      >
+                        <option value="">Escolha a categoria</option>
+                        {categorias.map((categoria) => (
+                          <option key={categoria.id} value={categoria.id}>
+                            {categoria.emoji || "📦"} {categoria.nome}
+                          </option>
+                        ))}
+                      </select>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        marginTop: "12px",
+                      }}
+                    >
+                      {modoGerenciador === "adicionar" ? (
+                        <button
+                          type="button"
+                          onClick={adicionarProduto}
+                          style={{
+                            flex: 1,
+                            padding: "10px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ➕ ADICIONAR ITEM
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={salvarEdicao}
+                            style={{
+                              flex: 1,
+                              padding: "10px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            💾 SALVAR
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const item = itens.find(
+                                (produto) => produto.id === editandoId
+                              );
+
+                              if (item) {
+                                excluirProduto(item);
+                              }
+                            }}
+                            style={{
+                              padding: "10px",
+                            }}
+                          >
+                            🗑️ EXCLUIR
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      <section className="panel">
+        <button
+          type="button"
+          onClick={() => {
+            setGerenciandoPosicoes((atual) => !atual);
+            setCategoriaPosicoesSelecionada(null);
+            setCategoriaSelecionada(null);
+            setBuscaProduto("");
+          }}
+          style={{
+            width: "100%",
+            padding: "13px",
+            fontWeight: "bold",
+            textAlign: "left",
+            cursor: "pointer",
+          }}
+        >
+          ⚙️ GERENCIAR POSIÇÕES
+        </button>
+
+        {gerenciandoPosicoes && (
+          <div style={{ marginTop: "12px" }}>
+            {!categoriaPosicoesSelecionada ? (
+              <>
+                <p
+                  style={{
+                    margin: "0 0 10px",
+                    fontSize: "12px",
+                    opacity: 0.7,
+                  }}
+                >
+                  Escolha uma categoria para organizar a posição dos itens.
+                </p>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: "8px",
+                  }}
+                >
+                  {categorias.map((categoria) => {
+                    const quantidade = itens.filter(
+                      (item) => item.categoria === categoria.id
+                    ).length;
+
+                    return (
+                      <button
+                        key={categoria.id}
+                        type="button"
+                        onClick={() => {
+                          setCategoriaPosicoesSelecionada(categoria.id);
+                          setCategoriaSelecionada(categoria.id);
+                          setBuscaProduto("");
+                        }}
+                        style={{
+                          padding: "12px 10px",
+                          textAlign: "left",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <strong>
+                          {categoria.emoji || "📦"} {categoria.nome}
+                        </strong>
+
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            opacity: 0.65,
+                            marginTop: "4px",
+                          }}
+                        >
+                          {quantidade}{" "}
+                          {quantidade === 1 ? "item" : "itens"}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <>
+                {(() => {
+                  const categoriaAtual = categorias.find(
+                    (categoria) =>
+                      categoria.id === categoriaPosicoesSelecionada
+                  );
+
+                  const itensDaCategoria = itens
+                    .filter(
+                      (item) =>
+                        item.categoria === categoriaPosicoesSelecionada
+                    )
+                    .sort((a, b) => {
+                      const ordemA = Number(a.ordem ?? 0);
+                      const ordemB = Number(b.ordem ?? 0);
+
+                      return ordemA - ordemB || a.id - b.id;
+                    });
+
+                  return (
+                    <>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "8px",
+                          marginBottom: "12px",
+                        }}
+                      >
+                        <strong>
+                          {categoriaAtual?.emoji || "📦"}{" "}
+                          {categoriaAtual?.nome || "Categoria"}
+                        </strong>
+
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            opacity: 0.65,
+                          }}
+                        >
+                          {itensDaCategoria.length}{" "}
+                          {itensDaCategoria.length === 1
+                            ? "item"
+                            : "itens"}
+                        </span>
+                      </div>
+
+                      {itensDaCategoria.length === 0 ? (
+                        <p
+                          style={{
+                            margin: "0 0 12px",
+                            fontSize: "12px",
+                            opacity: 0.65,
+                          }}
+                        >
+                          Esta categoria não possui itens.
+                        </p>
+                      ) : (
+                        <div
+                          style={{
+                            display: "grid",
+                            gap: "7px",
+                          }}
+                        >
+                          {itensDaCategoria.map((item, index) => (
+                            <div
+                              key={item.id}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                padding: "9px",
+                                borderRadius: "8px",
+                              }}
+                            >
+                              <strong
+                                style={{
+                                  minWidth: "28px",
+                                  textAlign: "center",
+                                  fontSize: "13px",
+                                }}
+                              >
+                                {index + 1}
+                              </strong>
+
+                              <div
+                                style={{
+                                  flex: 1,
+                                  minWidth: 0,
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {item.nome}
+                                </div>
+
+                                <div
+                                  style={{
+                                    fontSize: "10px",
+                                    opacity: 0.55,
+                                    marginTop: "2px",
+                                  }}
+                                >
+                                  ID: {item.id}
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  moverItem(item.id, "cima")
+                                }
+                                disabled={index === 0 || salvandoOrdem}
+                                title="Mover para cima"
+                                style={{
+                                  padding: "6px 8px",
+                                  cursor:
+                                    index === 0 || salvandoOrdem
+                                      ? "default"
+                                      : "pointer",
+                                  opacity:
+                                    index === 0 || salvandoOrdem
+                                      ? 0.35
+                                      : 1,
+                                }}
+                              >
+                                ⬆️
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  moverItem(item.id, "baixo")
+                                }
+                                disabled={
+                                  index === itensDaCategoria.length - 1 ||
+                                  salvandoOrdem
+                                }
+                                title="Mover para baixo"
+                                style={{
+                                  padding: "6px 8px",
+                                  cursor:
+                                    index === itensDaCategoria.length - 1 ||
+                                    salvandoOrdem
+                                      ? "default"
+                                      : "pointer",
+                                  opacity:
+                                    index === itensDaCategoria.length - 1 ||
+                                    salvandoOrdem
+                                      ? 0.35
+                                      : 1,
+                                }}
+                              >
+                                ⬇️
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCategoriaPosicoesSelecionada(null);
+                          setCategoriaSelecionada(null);
+                          setBuscaProduto("");
+                        }}
+                        style={{
+                          width: "100%",
+                          marginTop: "12px",
+                          padding: "10px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ← VOLTAR ÀS CATEGORIAS
+                      </button>
+                    </>
+                  );
+                })()}
+              </>
+            )}
+          </div>
+        )}
+
+      </section>
+
+    </main>  );
 }

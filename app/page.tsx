@@ -333,7 +333,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
       <div className="visualCircle">🏆</div>
       <span className="visualLine"></span>
     </div>
-    <div className="actionTitle">RANK DE CONTRABANDO</div>
+    <div className="actionTitle">RANK</div>
     <small>Classificação semanal</small>
     <b>ENTRAR →</b>
   </button>

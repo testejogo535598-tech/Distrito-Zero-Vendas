@@ -2,7 +2,7 @@
 import { supabase } from "../lib/supabase";
 import {useEffect,useMemo,useState} from "react";
 
-const HERB_PRICE=15000/50, SEED_PACK_PRICE=2000/4, FERT_PRICE=2500;
+const HERB_PRICE=8000/50, SEED_PACK_PRICE=2000/4, FERT_PRICE=2500;
 
 export default function Home(){
  const [lojaAberta,setLojaAberta]=useState(false);
@@ -405,7 +405,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 
     <div className="guidePrice">
       <span>🌿 Ervas Medicinais</span>
-      <strong>50 unidades — 15.000 DZ</strong>
+      <strong>50 unidades — 8.000 DZ</strong>
     </div>
 
     <div className="guidePrice">

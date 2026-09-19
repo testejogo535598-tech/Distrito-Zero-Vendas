@@ -333,8 +333,8 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
       <div className="visualCircle">🏆</div>
       <span className="visualLine"></span>
     </div>
-    <div className="actionTitle">TOP 10</div>
-    <small>Ranking semanal</small>
+    <div className="actionTitle">RANK DE CONTRABANDO</div>
+    <small>Classificação semanal</small>
     <b>ENTRAR →</b>
   </button>
 
@@ -606,7 +606,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 }
 
 {mode==="ranking"&&
-<Panel title="🏆 RANKING DOS VENDEDORES">
+<Panel title="🏆 RANK DE CONTRABANDO">
 
   <div className="ranking-intro">
     <span>⚔️</span>

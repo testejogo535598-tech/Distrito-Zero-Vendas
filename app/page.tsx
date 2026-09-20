@@ -30,6 +30,8 @@ export default function Home(){
  const [gamertagInicializado,setGamertagInicializado]=useState(false);
  const [mostrarIdentificacao,setMostrarIdentificacao]=useState(false);
  const [novaGamertag,setNovaGamertag]=useState("");
+ const [pin,setPin]=useState("");
+ const [modoIdentificacao,setModoIdentificacao]=useState<"login"|"cadastro">("cadastro");
  const [herbs,setHerbs]=useState(50);
  const [seeds,setSeeds]=useState(0); const [fert,setFert]=useState(0);
  const [notice,setNotice]=useState("");
@@ -38,35 +40,99 @@ export default function Home(){
  const WHATSAPP_MERCADOR="5518996396879";
 
  useEffect(()=>{
-  const salva=localStorage.getItem("dz_gamertag");
+  const idSalvo=localStorage.getItem("dz_jogador_id");
+  const nomeSalvo=localStorage.getItem("dz_gamertag");
 
-  if(salva){
-   setGamertag(salva);
-   setNovaGamertag(salva);
+  if(idSalvo && nomeSalvo){
+   setGamertag(nomeSalvo);
+   setNovaGamertag(nomeSalvo);
   }else{
+   localStorage.removeItem("dz_jogador_id");
+   localStorage.removeItem("dz_gamertag");
+      localStorage.removeItem("dz_jogador_id");
+   setGamertag("");
+   setNovaGamertag("");
+      setPin("");
+      setModoIdentificacao("login");
    setMostrarIdentificacao(true);
   }
 
   setGamertagInicializado(true);
  },[]);
 
- function salvarGamertag(){
+ async function salvarGamertag(){
   const nome=novaGamertag.trim();
+  const codigo=pin.trim();
 
   if(!nome){
    setNotice("Informe sua Gamertag.");
    return;
   }
 
-  localStorage.setItem("dz_gamertag",nome);
-  setGamertag(nome);
-  setNovaGamertag(nome);
-  setMostrarIdentificacao(false);
+  if(!/^[0-9]{4}$/.test(codigo)){
+   setNotice("O PIN deve ter exatamente 4 dígitos.");
+   return;
+  }
+
   setNotice("");
+
+  try{
+   if(modoIdentificacao==="cadastro"){
+    const {data,error}=await supabase.rpc("cadastrar_jogador_pin",{
+     p_gamertag:nome,
+     p_pin:codigo
+    });
+
+    if(error || !data?.[0]){
+     console.error(error);
+     setNotice(error?.message || "Não foi possível cadastrar a conta.");
+     return;
+    }
+
+    const jogador=data[0];
+
+    localStorage.setItem("dz_jogador_id",String(jogador.id));
+    localStorage.setItem("dz_gamertag",jogador.gamertag);
+
+    setGamertag(jogador.gamertag);
+    setNovaGamertag(jogador.gamertag);
+    setPin("");
+    setMostrarIdentificacao(false);
+    setNotice("");
+    return;
+   }
+
+   const {data,error}=await supabase.rpc("login_jogador_pin",{
+    p_gamertag:nome,
+    p_pin:codigo
+   });
+
+   if(error || !data?.[0]){
+    console.error(error);
+    setNotice(error?.message || "Gamertag ou PIN incorreto.");
+    return;
+   }
+
+   const jogador=data[0];
+
+   localStorage.setItem("dz_jogador_id",String(jogador.id));
+   localStorage.setItem("dz_gamertag",jogador.gamertag);
+
+   setGamertag(jogador.gamertag);
+   setNovaGamertag(jogador.gamertag);
+   setPin("");
+   setMostrarIdentificacao(false);
+   setNotice("");
+  }catch(error){
+   console.error(error);
+   setNotice("Não foi possível concluir a identificação.");
+  }
  }
 
  function trocarGamertag(){
   setNovaGamertag(gamertag);
+  setPin("");
+  setModoIdentificacao("login");
   setMostrarIdentificacao(true);
  }
 function abrirWhatsAppPedido(mensagem:string){
@@ -168,17 +234,14 @@ function abrirWhatsAppPedido(mensagem:string){
   setNotice("Enviando pedido...");
 
   try{
-   const {data:playerData,error:playerError}=await supabase.rpc("obter_ou_criar_jogador",{
-    p_gamertag:gamertag.trim()
-   });
+   const jogadorId=Number(localStorage.getItem("dz_jogador_id"));
 
-   if(playerError || !playerData?.[0]){
-    console.error(playerError);
-    setNotice(playerError?.message || "Não foi possível identificar o jogador.");
+   if(!jogadorId){
+    setNotice("Faça sua identificação novamente.");
     return;
    }
 
-   const player=playerData[0];
+   const player={id:jogadorId};
 
    const {data:pedidoId,error:pedidoError}=await supabase.rpc("criar_pedido_loja",{
     p_jogador_id:player.id,
@@ -280,17 +343,13 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 
    setNotice("Enviando pedido...");
 
-   const { data: playerData, error: playerError } = await supabase
-    .rpc("obter_ou_criar_jogador", {
-      p_gamertag: gamertag.trim(),
-    });
+   const jogadorId=Number(localStorage.getItem("dz_jogador_id"));
 
-   if (playerError || !playerData?.[0]) {
-     console.error(playerError);
-     return setNotice("Não foi possível cadastrar ou identificar o jogador.");
+   if(!jogadorId){
+    return setNotice("Faça sua identificação novamente.");
    }
 
-   const player = playerData[0];
+   const player={id:jogadorId};
 
    const { error: orderError } = await supabase.from("pedidos").insert({
      jogador_id: player.id,
@@ -348,10 +407,20 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
   {gamertagInicializado&&gamertag&&
    <button
     type="button"
-    onClick={trocarGamertag}
+    onClick={()=>{
+      localStorage.removeItem("dz_gamertag");
+      localStorage.removeItem("dz_jogador_id");
+      setGamertag("");
+      setNovaGamertag("");
+      setPin("");
+      setModoIdentificacao("login");
+      setMostrarIdentificacao(true);
+      setNotice("");
+      setMode("home");
+    }}
     className="gamertag-card"
    >
-    TROCAR CONTA
+    SAIR
    </button>
   }
  </div></div></header>
@@ -429,7 +498,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
     lineHeight:1.45,
     opacity:0.8
    }}>
-    Informe sua Gamertag. Ela ficará salva neste aparelho para os próximos pedidos.
+    Use sua Gamertag e um PIN de 4 dígitos para acessar sua conta.
    </p>
 
    <input
@@ -444,6 +513,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
      display:"block",
      width:"100%",
      padding:"10px",
+     marginBottom:"8px",
      boxSizing:"border-box",
      borderRadius:"8px",
      border:"1px solid rgba(255,255,255,0.2)",
@@ -451,6 +521,43 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
      color:"inherit"
     }}
    />
+
+   <input
+    type="password"
+    inputMode="numeric"
+    maxLength={4}
+    value={pin}
+    onChange={e=>setPin(e.target.value.replace(/\D/g,"").slice(0,4))}
+    onKeyDown={e=>{
+     if(e.key==="Enter") salvarGamertag();
+    }}
+    placeholder="PIN de 4 dígitos"
+    style={{
+     display:"block",
+     width:"100%",
+     padding:"10px",
+     boxSizing:"border-box",
+     borderRadius:"8px",
+     border:"1px solid rgba(255,255,255,0.2)",
+     background:"#181818",
+     color:"inherit"
+    }}
+   />
+
+   {notice&&
+    <div style={{
+     marginTop:"10px",
+     padding:"9px 10px",
+     borderRadius:"8px",
+     background:"rgba(120,30,30,0.18)",
+     border:"1px solid rgba(220,90,90,0.35)",
+     color:"#e8b0b0",
+     fontSize:"12px",
+     textAlign:"center"
+    }}>
+     {notice}
+    </div>
+   }
 
    <button
     type="button"
@@ -465,7 +572,28 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
      cursor:"pointer"
     }}
    >
-    CONTINUAR
+    ENTRAR
+   </button>
+
+   <button
+    type="button"
+    onClick={()=>{
+     setModoIdentificacao(modoIdentificacao==="login"?"cadastro":"login");
+     setPin("");
+     setNotice("");
+    }}
+    style={{
+     width:"100%",
+     marginTop:"7px",
+     padding:"8px",
+     border:"0",
+     background:"transparent",
+     color:"inherit",
+     opacity:0.65,
+     cursor:"pointer"
+    }}
+   >
+    {modoIdentificacao==="login" ? "PRIMEIRO ACESSO / CRIAR PIN" : "JÁ TENHO PIN / ENTRAR"}
    </button>
 
    {gamertag&&
@@ -474,12 +602,12 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
      onClick={()=>setMostrarIdentificacao(false)}
      style={{
       width:"100%",
-      marginTop:"7px",
+      marginTop:"4px",
       padding:"8px",
       border:"0",
       background:"transparent",
       color:"inherit",
-      opacity:0.65,
+      opacity:0.5,
       cursor:"pointer"
      }}
     >

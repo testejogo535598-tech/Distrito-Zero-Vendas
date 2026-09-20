@@ -26,12 +26,49 @@ export default function Home(){
 
  const [categoriasLoja,setCategoriasLoja]=useState<any[]>([]);
  const [mode,setMode]=useState<"home"|"sell"|"buy"|"orders"|"ranking">("home");
- const [gamertag,setGamertag]=useState(""); const [herbs,setHerbs]=useState(50);
+ const [gamertag,setGamertag]=useState("");
+ const [gamertagInicializado,setGamertagInicializado]=useState(false);
+ const [mostrarIdentificacao,setMostrarIdentificacao]=useState(false);
+ const [novaGamertag,setNovaGamertag]=useState("");
+ const [herbs,setHerbs]=useState(50);
  const [seeds,setSeeds]=useState(0); const [fert,setFert]=useState(0);
  const [notice,setNotice]=useState("");
  const [pedidoLojaId,setPedidoLojaId]=useState<number|null>(null);
 
  const WHATSAPP_MERCADOR="5518996396879";
+
+ useEffect(()=>{
+  const salva=localStorage.getItem("dz_gamertag");
+
+  if(salva){
+   setGamertag(salva);
+   setNovaGamertag(salva);
+  }else{
+   setMostrarIdentificacao(true);
+  }
+
+  setGamertagInicializado(true);
+ },[]);
+
+ function salvarGamertag(){
+  const nome=novaGamertag.trim();
+
+  if(!nome){
+   setNotice("Informe sua Gamertag.");
+   return;
+  }
+
+  localStorage.setItem("dz_gamertag",nome);
+  setGamertag(nome);
+  setNovaGamertag(nome);
+  setMostrarIdentificacao(false);
+  setNotice("");
+ }
+
+ function trocarGamertag(){
+  setNovaGamertag(gamertag);
+  setMostrarIdentificacao(true);
+ }
 function abrirWhatsAppPedido(mensagem:string){
   window.open(
     `https://wa.me/${WHATSAPP_MERCADOR}?text=${encodeURIComponent(mensagem)}`,
@@ -305,7 +342,19 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
  }
 
  return <main>
-  <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO&nbsp;Z</h1><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>A ÚLTIMA ESPERANÇA AINDA BROTA.</em><div className="hero-admin"><button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Mercador</button></div></div></header>
+  <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO&nbsp;Z</h1><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>A ÚLTIMA ESPERANÇA AINDA BROTA.</em><div className="hero-admin">
+  <button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Mercador</button>
+
+  {gamertagInicializado&&gamertag&&
+   <button
+    type="button"
+    onClick={trocarGamertag}
+    className="gamertag-card"
+   >
+    TROCAR CONTA
+   </button>
+  }
+ </div></div></header>
   <nav className="mainActions">
 
   <button className="actionCard actionHerbs" onClick={() => {setMode("sell");setNotice("")}}>
@@ -349,7 +398,99 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
   </button>
 
 </nav>
-  <div className="wrap">{notice&&<div className="notice">{notice}</div>}
+
+
+{mostrarIdentificacao&&
+ <div style={{
+  position:"fixed",
+  inset:0,
+  zIndex:10000,
+  background:"rgba(0,0,0,0.78)",
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+  padding:"16px"
+ }}>
+  <div style={{
+   width:"100%",
+   maxWidth:"390px",
+   background:"#111",
+   border:"1px solid rgba(255,255,255,0.18)",
+   borderRadius:"12px",
+   padding:"18px",
+   boxSizing:"border-box",
+   boxShadow:"0 10px 35px rgba(0,0,0,0.5)"
+  }}>
+   <h2 style={{margin:"0 0 8px",fontSize:"18px"}}>🎮 IDENTIFICAÇÃO</h2>
+
+   <p style={{
+    margin:"0 0 14px",
+    fontSize:"13px",
+    lineHeight:1.45,
+    opacity:0.8
+   }}>
+    Informe sua Gamertag. Ela ficará salva neste aparelho para os próximos pedidos.
+   </p>
+
+   <input
+    autoFocus
+    value={novaGamertag}
+    onChange={e=>setNovaGamertag(e.target.value)}
+    onKeyDown={e=>{
+     if(e.key==="Enter") salvarGamertag();
+    }}
+    placeholder="Sua Gamertag"
+    style={{
+     display:"block",
+     width:"100%",
+     padding:"10px",
+     boxSizing:"border-box",
+     borderRadius:"8px",
+     border:"1px solid rgba(255,255,255,0.2)",
+     background:"#181818",
+     color:"inherit"
+    }}
+   />
+
+   <button
+    type="button"
+    onClick={salvarGamertag}
+    style={{
+     width:"100%",
+     marginTop:"10px",
+     padding:"10px",
+     border:"0",
+     borderRadius:"8px",
+     fontWeight:800,
+     cursor:"pointer"
+    }}
+   >
+    CONTINUAR
+   </button>
+
+   {gamertag&&
+    <button
+     type="button"
+     onClick={()=>setMostrarIdentificacao(false)}
+     style={{
+      width:"100%",
+      marginTop:"7px",
+      padding:"8px",
+      border:"0",
+      background:"transparent",
+      color:"inherit",
+      opacity:0.65,
+      cursor:"pointer"
+     }}
+    >
+     CANCELAR
+    </button>
+   }
+  </div>
+ </div>
+}
+
+<div className="wrap">{notice&&<div className="notice">{notice}</div>}
   {pedidoLojaId&&<div className="whatsappEntrega">
    <p>Entre em contato com o mercador pelo WhatsApp para combinar o melhor horário para sua entrega.</p>
    <button type="button" onClick={falarComMercadorWhatsApp}>📱 FALAR COM O MERCADOR PELO WHATSAPP</button>
@@ -579,15 +720,6 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
               TOTAL: {totalCarrinho.toLocaleString("pt-BR")} DZ Coins
             </div>
 
-            <label style={{ display: "block", marginTop: "14px" }}>
-              Gamertag
-              <input
-                value={gamertag}
-                onChange={(e) => setGamertag(e.target.value)}
-                placeholder="Nome no jogo"
-                style={{ display: "block", width: "100%", marginTop: "5px", padding: "9px", boxSizing: "border-box" }}
-              />
-            </label>
 
             <button
               type="button"
@@ -740,14 +872,6 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 
 </Panel>}
    {mode==="sell"&&<Panel title="🌿 VENDER ERVAS">
-<label>
-Gametag
-<input
-value={gamertag}
-onChange={e=>setGamertag(e.target.value)}
-placeholder="Nome no jogo"
-/>
-</label>
 
 <div className="product">
 <span>🌿 Ervas Medicinais</span>
@@ -768,7 +892,7 @@ AGENDAR VENDA
 </button>
 </Panel>}
 
-{mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><label>Gamertag<input value={gamertag} onChange={e=>setGamertag(e.target.value)} placeholder="Nome no jogo"/></label><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={seeds || ""} onChange={e=>setSeeds(Math.max(0, Number(e.target.value)))} /></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={fert || ""} onChange={e=>setFert(Math.max(0, Number(e.target.value)))} /></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
+{mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={seeds || ""} onChange={e=>setSeeds(Math.max(0, Number(e.target.value)))} /></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={fert || ""} onChange={e=>setFert(Math.max(0, Number(e.target.value)))} /></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
   </div><footer>DISTRITO ZERO • HOLOCAUSTO • <small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
  </main>
 }

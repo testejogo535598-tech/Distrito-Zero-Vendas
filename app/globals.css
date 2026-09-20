@@ -2335,7 +2335,10 @@ body {
 
 .hero-admin{
   display:flex;
-  justify-content:flex-end;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:flex-start;
+  gap:7px;
   margin-top:22px;
   width:100%;
 }
@@ -2373,14 +2376,51 @@ body {
   transform:translateY(-1px);
 }
 
+.gamertag-card{
+  margin:0!important;
+  padding:7px 12px!important;
+
+  border:1px solid rgba(150,170,130,.25)!important;
+  border-radius:8px!important;
+
+  background:rgba(5,8,6,.48)!important;
+  backdrop-filter:blur(4px);
+
+  color:#aab89c!important;
+  font-size:10px!important;
+  font-weight:600!important;
+  letter-spacing:.7px;
+
+  opacity:.82;
+  box-shadow:0 4px 14px rgba(0,0,0,.18)!important;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+.gamertag-card:hover{
+  color:#d1dfc2!important;
+  background:rgba(15,21,14,.72)!important;
+  border-color:rgba(170,195,145,.42)!important;
+  opacity:1;
+  transform:translateY(-1px);
+}
+
 /* Celular */
 @media (max-width:760px){
   .hero-admin{
-    justify-content:flex-end;
+    align-items:flex-end;
     margin-top:20px;
+    gap:7px;
   }
 
-  .admin-link{
+  .admin-link,
+  .gamertag-card{
     padding:7px 11px!important;
     font-size:10px!important;
   }

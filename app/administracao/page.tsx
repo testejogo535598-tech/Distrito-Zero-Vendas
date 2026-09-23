@@ -11,6 +11,7 @@ type PedidoItem = {
   quantidade: number;
   valor_unitario: number;
   subtotal: number;
+  tipo_valor?: "dzcoins" | "real";
 };
 
 type Pedido = {
@@ -31,11 +32,14 @@ type Pedido = {
   }[];
 };
 
+type TipoValor = "dzcoins" | "real";
+
 type Item = {
   id: number;
   nome: string;
   categoria: string;
   valor: number;
+  tipo_valor: TipoValor;
   ordem: number;
 };
 
@@ -138,6 +142,7 @@ export default function Administracao() {
   const [categoriaProduto, setCategoriaProduto] =
     useState("construcao");
   const [precoProduto, setPrecoProduto] = useState("");
+  const [tipoValorProduto, setTipoValorProduto] = useState<TipoValor>("dzcoins");
 
   const [editandoId, setEditandoId] =
     useState<number | null>(null);
@@ -187,7 +192,27 @@ export default function Administracao() {
       0
     );
 
-  async function carregarPedidos() {
+  async function formatarValorPedidoAdmin(valor: number, tipo: "dzcoins" | "real") {
+  if (tipo === "real") {
+    return (Number(valor) / 100).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  return `${Number(valor).toLocaleString("pt-BR")} DZ Coins`;
+}
+
+function obterTipoValorPedido(pedido: any): "dzcoins" | "real" {
+  const tipo = pedido?.pedido_itens?.[0]?.tipo_valor;
+  return tipo === "real" ? "real" : "dzcoins";
+}
+
+function formatarValorPedidoAdminComPedido(valor: number, pedido: any) {
+  return formatarValorPedidoAdmin(valor, obterTipoValorPedido(pedido));
+}
+
+async function carregarPedidos() {
     setCarregando(true);
 
     const { data: pedidosData, error: pedidosError } = await supabase
@@ -228,6 +253,7 @@ export default function Administracao() {
             quantidade,
             valor_unitario,
             subtotal
+        tipo_valor,
           `)
           .in("pedido_id", ids)
       : { data: [], error: null };
@@ -559,6 +585,45 @@ Essa ação não poderá ser desfeita.`
     alert("Categoria excluída com sucesso!");
   }
 
+  function converterPrecoParaBanco(valorTexto: string, tipo: TipoValor) {
+    const texto = valorTexto.trim().replace(/\s/g, "");
+
+    if (!texto) return NaN;
+
+    if (tipo === "real") {
+      let normalizado = texto;
+
+      if (normalizado.includes(",") && normalizado.includes(".")) {
+        normalizado = normalizado.replace(/\./g, "").replace(",", ".");
+      } else if (normalizado.includes(",")) {
+        normalizado = normalizado.replace(",", ".");
+      }
+
+      const valor = Number(normalizado);
+
+      if (!Number.isFinite(valor) || valor < 0) return NaN;
+
+      return Math.round(valor * 100);
+    }
+
+    const valor = Number(texto.replace(/[^\d]/g, ""));
+
+    if (!Number.isFinite(valor) || valor < 0) return NaN;
+
+    return Math.round(valor);
+  }
+
+  function formatarValorAdmin(valor: number, tipo: TipoValor) {
+    if (tipo === "real") {
+      return (Number(valor) / 100).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    }
+
+    return `${Number(valor).toLocaleString("pt-BR")} DZ Coins`;
+  }
+
   async function adicionarProduto() {
     const nome = nomeProduto.trim();
     const valor = Number(precoProduto);
@@ -584,7 +649,8 @@ Essa ação não poderá ser desfeita.`
         nome,
         categoria: categoriaProduto,
         valor,
-      });
+              tipo_valor: tipoValorProduto,
+});
 
     if (error) {
       console.error(
@@ -612,7 +678,12 @@ Essa ação não poderá ser desfeita.`
     setEditandoId(item.id);
     setNomeProduto(item.nome);
     setCategoriaProduto(item.categoria);
-    setPrecoProduto(String(item.valor));
+    setPrecoProduto(
+      item.tipo_valor === "real"
+        ? (Number(item.valor) / 100).toFixed(2).replace(".", ",")
+        : String(item.valor)
+    );
+    setTipoValorProduto(item.tipo_valor === "real" ? "real" : "dzcoins");
 
     window.scrollTo({
       top: 0,
@@ -625,6 +696,7 @@ Essa ação não poderá ser desfeita.`
     setNomeProduto("");
     setCategoriaProduto("construcao");
     setPrecoProduto("");
+    setTipoValorProduto("dzcoins");
   }
 
   async function salvarEdicao() {
@@ -1010,7 +1082,10 @@ Essa ação não poderá ser desfeita.`
                     <div style={{ marginTop: "6px", fontSize: "11px", opacity: 0.8 }}>
                       {pedido.pedido_itens.map((item) => (
                         <div key={item.id}>
-                          • {item.nome_produto} × {item.quantidade} — {Number(item.subtotal).toLocaleString("pt-BR")} DZ
+                          • {item.nome_produto} × {item.quantidade} — {formatarValorPedidoAdmin(
+                      Number(item.subtotal),
+                      item.tipo_valor === "real" ? "real" : "dzcoins"
+                    )}
                         </div>
                       ))}
                     </div>
@@ -1625,12 +1700,27 @@ Essa ação não poderá ser desfeita.`
                         placeholder="Nome do item"
                       />
 
+                      <select
+                        value={tipoValorProduto}
+                        onChange={(e) => {
+                          setTipoValorProduto(e.target.value as TipoValor);
+                          setPrecoProduto("");
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "9px",
+                        }}
+                      >
+                        <option value="dzcoins">🪙 DZ Coins</option>
+                        <option value="real">💵 Dinheiro (R$)</option>
+                      </select>
+
                       <input
                         value={precoProduto}
                         onChange={(e) => setPrecoProduto(e.target.value)}
-                        placeholder="Valor"
-                        type="number"
-                        min="0"
+                        placeholder={tipoValorProduto === "real" ? "Valor em R$ (ex.: 25,00)" : "Valor em DZ Coins"}
+                        type="text"
+                        inputMode="decimal"
                       />
 
 

@@ -6,14 +6,28 @@ export async function POST(request: Request) {
   try {
     const pedido = await request.json();
 
-    const itensHtml = Array.isArray(pedido.items)
+    function formatarValor(valor: number, tipo: "dzcoins" | "real") {
+  if (tipo === "real") {
+    return (Number(valor) / 100).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  return `${Number(valor).toLocaleString("pt-BR")} DZ Coins`;
+}
+
+const itensHtml = Array.isArray(pedido.items)
       ? pedido.items
           .map(
             (item: any) => `
               <div style="margin-bottom:12px;">
                 <strong>${item.nome}</strong><br>
                 Quantidade: ${Number(item.quantidade)}<br>
-                Valor unitário: ${Number(item.valor).toLocaleString("pt-BR")} DZ Coins<br>
+                Valor unitário: ${formatarValor(
+        Number(item.valor),
+        item.tipo_valor === "real" ? "real" : "dzcoins"
+      )}<br>
                 Subtotal: ${Number(
                   item.valor * item.quantidade
                 ).toLocaleString("pt-BR")} DZ Coins
@@ -55,7 +69,10 @@ export async function POST(request: Request) {
 
         <p>
           <strong>💰 Valor total:</strong>
-          ${Number(pedido.total).toLocaleString("pt-BR")} DZ Coins
+          ${formatarValor(
+    Number(pedido.total),
+    pedido.items?.[0]?.tipo_valor === "real" ? "real" : "dzcoins"
+  )}
         </p>
 
         <p>

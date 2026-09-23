@@ -11,13 +11,27 @@ export default function Home(){
  const [carregandoLoja,setCarregandoLoja]=useState(false);
  const [erroLoja,setErroLoja]=useState("");
  const [pesquisaLoja,setPesquisaLoja]=useState("");
+ type TipoValor = "dzcoins" | "real";
+
  type CarrinhoItem = {
   id: number;
   nome: string;
   categoria: string;
   valor: number;
+  tipoValor: TipoValor;
   quantidade: number;
  };
+
+ function formatarValor(valor:number,tipo:TipoValor){
+  if(tipo==="real"){
+   return (Number(valor)/100).toLocaleString("pt-BR",{
+    style:"currency",
+    currency:"BRL"
+   });
+  }
+
+  return `${Number(valor).toLocaleString("pt-BR")} DZ Coins`;
+ }
 
  const [carrinho,setCarrinho]=useState<CarrinhoItem[]>([]);
  const [carrinhoAberto,setCarrinhoAberto]=useState(false);
@@ -165,6 +179,8 @@ function abrirWhatsAppPedido(mensagem:string){
 
 
  function adicionarAoCarrinho(item:any){
+  const tipoValor:TipoValor = item.tipo_valor === "real" ? "real" : "dzcoins";
+
   setCarrinho(prev => {
    const existente = prev.find(p => p.id === item.id);
 
@@ -176,6 +192,11 @@ function abrirWhatsAppPedido(mensagem:string){
     );
    }
 
+   if(prev.length > 0 && prev[0].tipoValor !== tipoValor){
+    setNotice("Não é possível misturar DZ Coins e Dinheiro (R$) no mesmo carrinho.");
+    return prev;
+   }
+
    return [
     ...prev,
     {
@@ -183,6 +204,7 @@ function abrirWhatsAppPedido(mensagem:string){
      nome: item.nome,
      categoria: item.categoria,
      valor: Number(item.valor),
+     tipoValor,
      quantidade: 1
     }
    ];
@@ -260,7 +282,8 @@ function abrirWhatsAppPedido(mensagem:string){
     nome_produto:item.nome,
     quantidade:item.quantidade,
     valor_unitario:item.valor,
-    subtotal:item.valor*item.quantidade
+    subtotal:item.valor*item.quantidade,
+    tipo_valor:item.tipoValor
    }));
 
    const {error:itensError}=await supabase
@@ -273,7 +296,7 @@ function abrirWhatsAppPedido(mensagem:string){
     return;
    }
 
-   const itensMensagem=carrinho.map(item=>`• ${item.nome} — ${item.quantidade}x — ${(Number(item.valor)*Number(item.quantidade)).toLocaleString("pt-BR")} DZ Coins`).join("\n");
+   const itensMensagem=carrinho.map(item=>`• ${item.nome} — ${item.quantidade}x — ${formatarValor(Number(item.valor)*Number(item.quantidade), item.tipoValor)}`).join("\n");
 
    const mensagemWhatsApp=`🚨 NOVO PEDIDO — DISTRITO ZERO
 
@@ -283,7 +306,7 @@ Gamertag: ${gamertag.trim()}
 🛒 PRODUTOS
 ${itensMensagem}
 
-💰 VALOR TOTAL: ${Number(totalCarrinho).toLocaleString("pt-BR")} DZ Coins
+💰 VALOR TOTAL: ${formatarValor(Number(totalCarrinho), carrinho[0]?.tipoValor || "dzcoins")}
 
 📦 Status: Processando
 
@@ -313,7 +336,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 
    const { data, error } = await supabase
      .from("itens")
-     .select("id, nome, categoria, valor, ordem")
+     .select("id, nome, categoria, valor, ordem, tipo_valor")
      .eq("categoria", categoria)
     .order("ordem", { ascending: true })
     .order("id", { ascending: true });
@@ -793,7 +816,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
                       <small>ID #{item.id}</small>
                     </div>
                     <strong>
-                      {Number(item.valor).toLocaleString("pt-BR")} DZ Coins
+                      {formatarValor(Number(item.valor), item.tipo_valor === "real" ? "real" : "dzcoins")}
                     </strong>
                   </div>
                 ))}
@@ -822,7 +845,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
               {carrinho.map((item) => (
                 <div key={item.id} style={{ padding: "10px", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "9px" }}>
                   <div style={{ fontWeight: 700 }}>{item.nome}</div>
-                  <div style={{ fontSize: "13px", opacity: 0.75 }}>{Number(item.valor).toLocaleString("pt-BR")} DZ Coins cada</div>
+                  <div style={{ fontSize: "13px", opacity: 0.75 }}>{formatarValor(Number(item.valor), item.tipoValor)} cada</div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "8px" }}>
                     <input
@@ -835,7 +858,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
                     />
 
                     <span style={{ flex: 1 }}>
-                      {(item.valor * item.quantidade).toLocaleString("pt-BR")} DZ Coins
+                      {formatarValor(item.valor * item.quantidade, item.tipoValor)}
                     </span>
 
                     <button type="button" onClick={() => removerDoCarrinho(item.id)}>REMOVER</button>
@@ -845,7 +868,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
             </div>
 
             <div style={{ marginTop: "14px", paddingTop: "12px", borderTop: "1px solid rgba(255,255,255,0.15)", fontWeight: 700 }}>
-              TOTAL: {totalCarrinho.toLocaleString("pt-BR")} DZ Coins
+              TOTAL: {formatarValor(totalCarrinho, carrinho[0]?.tipoValor || "dzcoins")}
             </div>
 
 

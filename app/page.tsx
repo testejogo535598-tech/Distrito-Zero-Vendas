@@ -149,11 +149,15 @@ export default function Home(){
   setModoIdentificacao("login");
   setMostrarIdentificacao(true);
  }
-function abrirWhatsAppPedido(mensagem:string){
-  window.open(
-    `https://wa.me/${WHATSAPP_MERCADOR}?text=${encodeURIComponent(mensagem)}`,
-    "_blank"
-  );
+function abrirWhatsAppPedido(mensagem:string, janela?:Window|null){
+  const url = `https://wa.me/${WHATSAPP_MERCADOR}?text=${encodeURIComponent(mensagem)}`;
+
+  if(janela && !janela.closed){
+    janela.location.href = url;
+    return;
+  }
+
+  window.location.href = url;
 }
 
  function falarComMercadorWhatsApp(){
@@ -252,6 +256,8 @@ function abrirWhatsAppPedido(mensagem:string){
    return setNotice("Informe sua Gamertag.");
   }
 
+  const janelaWhatsApp = window.open("about:blank", "_blank");
+
   setEnviandoCarrinho(true);
   setNotice("Enviando pedido...");
 
@@ -312,7 +318,7 @@ ${itensMensagem}
 
 Olá! Gostaria de combinar a entrega deste pedido.`;
 
-   abrirWhatsAppPedido(mensagemWhatsApp);
+   abrirWhatsAppPedido(mensagemWhatsApp, janelaWhatsApp);
    setCarrinho([]);
    setCarrinhoAberto(false);
    setLojaAberta(false);
@@ -374,6 +380,8 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
 
    const player={id:jogadorId};
 
+   const janelaWhatsApp = window.open("about:blank", "_blank");
+
    const { error: orderError } = await supabase.from("pedidos").insert({
      jogador_id: player.id,
      tipo: type,
@@ -418,7 +426,7 @@ Gamertag: ${localOrder.gamertag}
 
 Olá! Gostaria de combinar a entrega deste pedido.`;
 
-   abrirWhatsAppPedido(mensagemWhatsApp);
+   abrirWhatsAppPedido(mensagemWhatsApp, janelaWhatsApp);
    setNotice(`Pedido #${localOrder.id} enviado com sucesso.`);
    setMode("home");
  }

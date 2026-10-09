@@ -39,7 +39,8 @@ export default function Home(){
 
 
  const [categoriasLoja,setCategoriasLoja]=useState<any[]>([]);
- const [mode,setMode]=useState<"home"|"sell"|"buy"|"orders"|"ranking">("home");
+ const [mode,setMode]=useState<"home"|"sell"|"buy"|"orders"|"ranking"|"boxing">("home");
+ const [boxingRanking,setBoxingRanking]=useState<any[]>([]);
  const [gamertag,setGamertag]=useState("");
  const [gamertagInicializado,setGamertagInicializado]=useState(false);
  const [mostrarIdentificacao,setMostrarIdentificacao]=useState(false);
@@ -173,6 +174,21 @@ function abrirWhatsAppPedido(mensagem:string, janela?:Window|null){
   const [ranking,setRanking]=useState<any[]>([]);
   useEffect(()=>{(async()=>{const {data}=await supabase.rpc("ranking_vendas");if(data)setRanking(data);})();},[]);
   useEffect(()=>{
+    let ativo=true;
+    (async()=>{
+      const {data,error}=await supabase
+        .from("nocaute_ranking")
+        .select("posicao,gamertag")
+        .order("posicao",{ascending:true});
+      if(error){
+        console.error("Erro ao carregar ranking do Nocaute:",error);
+        return;
+      }
+      if(ativo && data)setBoxingRanking(data);
+    })();
+    return ()=>{ativo=false;};
+  },[]);
+  useEffect(()=>{
    (async()=>{
     const {data,error}=await supabase.from("categorias").select("id,nome,emoji,imagem,descricao,ordem,ativa").eq("ativa",true).order("ordem",{ascending:true});
     if(error){console.error("Erro ao carregar categorias:",error);return;}
@@ -181,6 +197,13 @@ function abrirWhatsAppPedido(mensagem:string, janela?:Window|null){
   },[]);
 
 
+
+
+ useEffect(()=>{
+  if(mode === "boxing"){
+    window.scrollTo({top:0,left:0,behavior:"auto"});
+  }
+ },[mode]);
 
  function adicionarAoCarrinho(item:any){
   const tipoValor:TipoValor = item.tipo_valor === "real" ? "real" : "dzcoins";
@@ -431,7 +454,7 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
    setMode("home");
  }
 
- return <main>
+ return <main className={mode==="boxing"?"boxing-mode":""}>
   <header className="hero"><div className="shade"/><div className="heroText"><small>SERVIDOR</small><h1>HOLOCAUSTO&nbsp;Z</h1><div className="logo">DISTRITO <b>ZERO</b></div><strong>COMÉRCIO & CULTIVO</strong><em>A ÚLTIMA ESPERANÇA AINDA BROTA.</em><div className="hero-admin">
   <button className="admin-link" onClick={()=>window.location.href="/administracao/login"}>🔒 Mercador</button>
 
@@ -467,13 +490,13 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
     <b>ENTRAR →</b>
   </button>
 
-  <button className="actionCard actionSupplies" onClick={() => {setMode("buy");setNotice("")}}>
+  <button className="actionCard actionSupplies" onClick={() => {setMode("boxing");setNotice("")}}>
     <div className="actionVisual">
-      <div className="visualCircle">📦</div>
+      <div className="visualCircle">🥊</div>
       <span className="visualLine"></span>
     </div>
-    <div className="actionTitle">SUPRIMENTOS</div>
-    <small>Sementes e fertilizante</small>
+    <div className="actionTitle">NOCAUTE</div>
+    <small>RANKING OFICIAL DE LUTAS</small>
     <b>ENTRAR →</b>
   </button>
 
@@ -1030,6 +1053,156 @@ Olá! Gostaria de combinar a entrega deste pedido.`;
   </div>
 
 </Panel>}
+{mode==="boxing"&&
+<section className="boxing-screen">
+  <button className="boxing-back" type="button" onClick={()=>{setMode("home");setNotice("")}}>← VOLTAR AO DISTRITO ZERO</button>
+
+  <div style={{position:"relative",width:"100%",maxWidth:"none",margin:"0",lineHeight:0}}>
+    <img
+      src="/nocaute-ranking-base.png"
+      alt="Nocaute Holocausto"
+      style={{display:"block",width:"100%",height:"auto"}}
+    />
+
+    <div style={{position:"absolute",inset:0,pointerEvents:"none",lineHeight:"normal"}}>
+
+      {/* CAMPEÃO */}
+      <div style={{
+        position:"absolute",
+        left:"50%",
+        top:"53.5%",
+        transform:"translate(-50%,-50%)",
+        width:"45%",
+        textAlign:"center",
+        lineHeight:1,
+        fontWeight:900,
+        fontSize:"clamp(11px,3vw,28px)",
+        color:"#fff",
+        textShadow:"0 2px 3px #000, 0 0 7px #000",
+        textTransform:"uppercase"
+      }}>
+        {boxingRanking.find((x:any)=>Number(x.posicao)===0)?.gamertag || "SHXWTY"}
+      </div>
+
+      {/* RANKING 1 AO 8 */}
+      {[
+        1,2,3,4,5,6,7,8
+      ].map((position, i) => (
+        <div
+          key={"esq-"+position}
+          style={{
+            position:"absolute",
+            left:"25.5%",
+            top:`${64 + i * 4.5}%`,
+            transform:"translate(-50%,-50%)",
+            width:"45%",
+            minHeight:"4%",
+            boxSizing:"border-box",
+            display:"flex",
+            alignItems:"center",
+            overflow:"hidden",
+            border:"1px solid rgba(226,173,47,.85)",
+            borderRadius:"7px",
+            background:"linear-gradient(90deg, rgba(8,8,8,.94), rgba(27,22,15,.90), rgba(8,8,8,.94))",
+            boxShadow:"0 2px 7px rgba(0,0,0,.75), inset 0 0 8px rgba(218,164,42,.12)",
+            color:"#fff",
+            fontWeight:900,
+            fontSize:"clamp(10px,2.6vw,20px)",
+            textTransform:"uppercase",
+            textShadow:"0 2px 3px #000"
+          }}
+        >
+          <span style={{
+            width:"18%",
+            alignSelf:"stretch",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center",
+            flexShrink:0,
+            background:"linear-gradient(135deg,#8d620c,#e7b936,#7a5008)",
+            color:"#111",
+            fontWeight:1000,
+            textShadow:"0 1px 1px rgba(255,255,255,.35)",
+            borderRight:"1px solid rgba(255,205,72,.8)"
+          }}>
+            {position}º
+          </span>
+
+          <span style={{
+            flex:1,
+            minWidth:0,
+            padding:"0 7px",
+            textAlign:"center",
+            whiteSpace:"nowrap",
+            overflow:"hidden",
+            textOverflow:"ellipsis"
+          }}>
+            {boxingRanking.find((x:any)=>Number(x.posicao)===position)?.gamertag || "LUGAR DISPONÍVEL"}
+          </span>
+        </div>
+      ))}
+
+      {/* RANKING 9 AO 15 */}
+      {[
+        9,10,11,12,13,14,15
+      ].map((position, i) => (
+        <div
+          key={"dir-"+position}
+          style={{
+            position:"absolute",
+            left:"74.5%",
+            top:`${64 + i * 4.5}%`,
+            transform:"translate(-50%,-50%)",
+            width:"45%",
+            minHeight:"4%",
+            boxSizing:"border-box",
+            display:"flex",
+            alignItems:"center",
+            overflow:"hidden",
+            border:"1px solid rgba(226,173,47,.85)",
+            borderRadius:"7px",
+            background:"linear-gradient(90deg, rgba(8,8,8,.94), rgba(27,22,15,.90), rgba(8,8,8,.94))",
+            boxShadow:"0 2px 7px rgba(0,0,0,.75), inset 0 0 8px rgba(218,164,42,.12)",
+            color:"#fff",
+            fontWeight:900,
+            fontSize:"clamp(10px,2.6vw,20px)",
+            textTransform:"uppercase",
+            textShadow:"0 2px 3px #000"
+          }}
+        >
+          <span style={{
+            width:"18%",
+            alignSelf:"stretch",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center",
+            flexShrink:0,
+            background:"linear-gradient(135deg,#8d620c,#e7b936,#7a5008)",
+            color:"#111",
+            fontWeight:1000,
+            textShadow:"0 1px 1px rgba(255,255,255,.35)",
+            borderRight:"1px solid rgba(255,205,72,.8)"
+          }}>
+            {position}º
+          </span>
+
+          <span style={{
+            flex:1,
+            minWidth:0,
+            padding:"0 7px",
+            textAlign:"center",
+            whiteSpace:"nowrap",
+            overflow:"hidden",
+            textOverflow:"ellipsis"
+          }}>
+            {boxingRanking.find((x:any)=>Number(x.posicao)===position)?.gamertag || "LUGAR DISPONÍVEL"}
+          </span>
+        </div>
+      ))}
+
+    </div>
+  </div>
+</section>}
    {mode==="sell"&&<Panel title="🌿 VENDER ERVAS">
 
 <div className="product">
@@ -1052,7 +1225,15 @@ AGENDAR VENDA
 </Panel>}
 
 {mode==="buy"&&<Panel title="🛒 COMPRAR SUPRIMENTOS"><div className="product"><span>🌱 Sementes <small>4 pacotinhos = 2.000 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={seeds || ""} onChange={e=>setSeeds(Math.max(0, Number(e.target.value)))} /></div></div><div className="product"><span>🧪 Fertilizante <small>1 unidade = 2.500 DZ</small></span><div><input type="number" min="0" inputMode="numeric" value={fert || ""} onChange={e=>setFert(Math.max(0, Number(e.target.value)))} /></div></div><div className="total">Total<strong>{buyValue.toLocaleString("pt-BR")} DZ Coins</strong></div><button className="action" onClick={()=>submit("compra")}>AGENDAR COMPRA</button></Panel>}
-  </div><footer>DISTRITO ZERO • HOLOCAUSTO • <small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>
+  </div>{mode==="boxing"?<footer className="nocaute-event-footer">
+  <div className="nocaute-footer-top"><span>✦</span><span>EVENTO OFICIAL</span><span>✦</span></div>
+  <div className="nocaute-footer-emblem" aria-hidden="true">🥊</div>
+  <strong className="nocaute-footer-title">NOCAUTE <span>HOLOCAUSTO Z</span></strong>
+  <div className="nocaute-footer-divider"><i></i><b>CAMPEONATO DE BOXE</b><i></i></div>
+  <p className="nocaute-footer-slogan">ENTRE NO RINGUE.</p>
+  <p className="nocaute-footer-motto">CONQUISTE SEU LUGAR <span>•</span> VIRE LENDA.</p>
+  <div className="nocaute-footer-bottom">FORÇA <span>✦</span> HONRA <span>✦</span> GLÓRIA</div>
+</footer>:<footer>DISTRITO ZERO • HOLOCAUSTO • <small>PRODUZA. VENDA. FORTALEÇA O SERVIDOR.</small></footer>}
  </main>
 }
 function Card(p:any){return <button className="card" onClick={p.onClick}><span>{p.icon}</span><h3>{p.title}</h3><p>{p.text}</p><b>ACESSAR →</b></button>}

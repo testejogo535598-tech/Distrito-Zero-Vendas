@@ -3086,3 +3086,1135 @@ body {
 .whatsappEntrega button:active {
   transform: scale(.98);
 }
+
+/* ===== NOCAUTE HOLOCAUSTO ===== */
+
+.boxing-hero {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin: 8px 0 18px;
+  padding: 24px 16px 20px;
+  box-sizing: border-box;
+  border: 1px solid rgba(170, 35, 35, .55);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(180, 35, 35, .18), transparent 38%),
+    linear-gradient(145deg, #170909, #080909 65%, #120707);
+  box-shadow:
+    0 14px 35px rgba(0,0,0,.45),
+    inset 0 1px rgba(255,255,255,.05);
+}
+
+.boxing-brand {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.boxing-brand span {
+  color: #aeb5ae;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.boxing-brand strong {
+  margin-top: 6px;
+  color: #f1eeee;
+  font-size: clamp(27px, 7vw, 44px);
+  font-weight: 950;
+  letter-spacing: 3px;
+  text-shadow: 0 4px 18px rgba(0,0,0,.8);
+}
+
+.boxing-brand small {
+  margin-top: 4px;
+  color: #c22d2d;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 5px;
+}
+
+.boxing-champion {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.boxing-champion-glow {
+  position: absolute;
+  top: 38px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: rgba(180, 25, 25, .22);
+  filter: blur(35px);
+  pointer-events: none;
+}
+
+.boxing-photo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  margin: 4px auto 12px;
+  border: 2px solid rgba(210, 55, 55, .75);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 35%, #343434, #111 68%);
+  box-shadow:
+    0 0 0 5px rgba(180,35,35,.08),
+    0 0 28px rgba(190,35,35,.28);
+}
+
+.boxing-photo span {
+  font-size: 52px;
+  filter: drop-shadow(0 5px 8px rgba(0,0,0,.6));
+}
+
+.boxing-champion-label span {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid rgba(220,55,55,.55);
+  border-radius: 999px;
+  background: rgba(100,15,15,.28);
+  color: #f0b2b2;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.boxing-champion h3 {
+  margin: 10px 0 2px;
+  color: #fff;
+  font-size: clamp(28px, 8vw, 46px);
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: 2px;
+  text-shadow: 0 3px 16px rgba(0,0,0,.9);
+}
+
+.boxing-champion-title {
+  color: #d43a3a;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.boxing-belt {
+  margin-top: 13px;
+  padding: 8px 14px;
+  border: 1px solid rgba(196, 150, 55, .55);
+  border-radius: 7px;
+  background: linear-gradient(145deg, rgba(125,90,25,.28), rgba(45,30,10,.25));
+  color: #e2c16b;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.boxing-ranking-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 11px;
+  padding: 11px 12px;
+  border-left: 3px solid #b92d2d;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(120,20,20,.18), transparent);
+}
+
+.boxing-ranking-header > span {
+  font-size: 24px;
+}
+
+.boxing-ranking-header strong {
+  display: block;
+  color: #eee;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.boxing-ranking-header small {
+  display: block;
+  margin-top: 3px;
+  color: #899089;
+  font-size: 9px;
+}
+
+.boxing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.boxing-fighter {
+  position: relative;
+  min-width: 0;
+  min-height: 108px;
+  padding: 14px 11px 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #171919, #0c0d0d);
+  box-shadow: 0 7px 18px rgba(0,0,0,.22);
+}
+
+.boxing-fighter > strong {
+  color: #6f7770;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.boxing-fighter h3 {
+  margin: 9px 0 3px;
+  overflow: hidden;
+  color: #e3e6e3;
+  font-size: 13px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.boxing-fighter small {
+  color: #737b74;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .6px;
+}
+
+.boxing-medal {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  font-size: 21px;
+}
+
+.boxing-first {
+  border-color: rgba(205,160,65,.45);
+  background: linear-gradient(145deg, #211b0d, #11100b);
+  box-shadow: 0 8px 22px rgba(180,130,35,.08);
+}
+
+.boxing-first > strong {
+  color: #d8b75e;
+}
+
+.boxing-second {
+  border-color: rgba(180,180,180,.22);
+}
+
+.boxing-third {
+  border-color: rgba(155,95,55,.28);
+}
+
+.boxing-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 14px;
+  padding: 14px 10px;
+  border-top: 1px solid rgba(255,255,255,.06);
+  text-align: center;
+}
+
+.boxing-footer strong {
+  color: #c93636;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.boxing-footer small {
+  margin-top: 4px;
+  color: #777e78;
+  font-size: 9px;
+}
+
+@media (max-width: 430px) {
+  .boxing-hero {
+    padding: 20px 11px 17px;
+  }
+
+  .boxing-photo {
+    width: 112px;
+    height: 112px;
+  }
+
+  .boxing-photo span {
+    font-size: 45px;
+  }
+
+  .boxing-grid {
+    gap: 7px;
+  }
+
+  .boxing-fighter {
+    min-height: 102px;
+    padding: 12px 9px 10px;
+  }
+
+  .boxing-fighter h3 {
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 761px) {
+  .boxing-hero {
+    padding: 30px 24px 25px;
+  }
+
+  .boxing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .boxing-fighter {
+    min-height: 125px;
+    padding: 17px 15px;
+  }
+}
+
+
+/* ===== NOCAUTE HOLOCAUSTO — TELA EXCLUSIVA ===== */
+
+.boxing-mode {
+  min-height: 100vh !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.boxing-mode .hero,
+.boxing-mode .mainActions {
+  display: none !important;
+}
+
+.boxing-mode .wrap {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.boxing-mode .wrap > * {
+  display: none !important;
+}
+
+.boxing-mode .wrap > .boxing-screen {
+  display: block !important;
+}
+
+.boxing-screen {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 28px 20px 40px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.boxing-back {
+  position: relative;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 8px;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.boxing-back:hover {
+  background: rgba(255,255,255,.12);
+}
+
+@media (max-width: 700px) {
+  .boxing-screen {
+    padding: 18px 12px 30px;
+  }
+
+  .boxing-back {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* ===== FUNDO OFICIAL — NOCAUTE HOLOCAUSTO ===== */
+
+.boxing-screen {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.28) 0%,
+      rgba(0,0,0,.48) 55%,
+      rgba(0,0,0,.78) 100%
+    ),
+    url("/nocaute-holocausto.jpg") center center / cover no-repeat !important;
+}
+
+
+/* ===== NOCAUTE — CARDS TRANSPARENTES ===== */
+
+.boxing-fighter {
+  background: rgba(5, 5, 5, 0.42) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.boxing-first {
+  background: rgba(15, 10, 5, 0.48) !important;
+  border-color: rgba(255, 210, 80, 0.45) !important;
+}
+
+.boxing-second {
+  background: rgba(8, 8, 8, 0.42) !important;
+  border-color: rgba(220, 220, 220, 0.35) !important;
+}
+
+.boxing-third {
+  background: rgba(12, 7, 4, 0.42) !important;
+  border-color: rgba(205, 140, 70, 0.38) !important;
+}
+
+.boxing-ranking-header {
+  background: rgba(0, 0, 0, 0.38) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.boxing-footer {
+  background: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+
+/* ===== NOCAUTE — GLASS FORTE / FUNDO VISÍVEL ===== */
+
+.boxing-screen .boxing-champion,
+.boxing-screen .boxing-fighter,
+.boxing-screen .boxing-ranking-header,
+.boxing-screen .boxing-footer {
+  background: rgba(0, 0, 0, 0.32) !important;
+  background-image: none !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.20) !important;
+}
+
+/* CAMPEÃO — destaque sem esconder a imagem */
+.boxing-screen .boxing-champion {
+  background: rgba(0, 0, 0, 0.28) !important;
+}
+
+/* PRIMEIRO LUGAR */
+.boxing-screen .boxing-first {
+  background: rgba(20, 14, 5, 0.34) !important;
+}
+
+/* SEGUNDO LUGAR */
+.boxing-screen .boxing-second {
+  background: rgba(0, 0, 0, 0.30) !important;
+}
+
+/* TERCEIRO LUGAR */
+.boxing-screen .boxing-third {
+  background: rgba(15, 8, 3, 0.30) !important;
+}
+
+/* CABEÇALHO DO RANKING */
+.boxing-screen .boxing-ranking-header {
+  background: rgba(0, 0, 0, 0.25) !important;
+}
+
+/* RODAPÉ */
+.boxing-screen .boxing-footer {
+  background: rgba(0, 0, 0, 0.23) !important;
+}
+
+/* BOTÃO VOLTAR */
+.boxing-screen .boxing-back {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+/* REDUZ A ESCURECIDA SOBRE A FOTO */
+.boxing-screen {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.12) 0%,
+      rgba(0,0,0,.22) 55%,
+      rgba(0,0,0,.40) 100%
+    ),
+    url("/nocaute-holocausto.jpg") center center / cover no-repeat !important;
+}
+
+
+/* ===== NOCAUTE — IMAGEM COMO ELEMENTO PRINCIPAL ===== */
+
+.boxing-screen {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.03) 0%,
+      rgba(0,0,0,.08) 50%,
+      rgba(0,0,0,.18) 100%
+    ),
+    url("/nocaute-holocausto.jpg") center center / cover no-repeat !important;
+}
+
+/* Remove o grande painel que escondia a arte */
+.boxing-screen .boxing-champion {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* O ranking vira conteúdo flutuante sobre a imagem */
+.boxing-screen .boxing-fighter {
+  background: rgba(0,0,0,.10) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.18) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Destaques das três primeiras posições */
+.boxing-screen .boxing-first {
+  background: rgba(60,40,5,.12) !important;
+  border-bottom-color: rgba(255,210,80,.45) !important;
+}
+
+.boxing-screen .boxing-second {
+  background: rgba(255,255,255,.06) !important;
+  border-bottom-color: rgba(220,220,220,.35) !important;
+}
+
+.boxing-screen .boxing-third {
+  background: rgba(80,40,10,.08) !important;
+  border-bottom-color: rgba(205,140,70,.35) !important;
+}
+
+/* Cabeçalho do ranking sem painel */
+.boxing-screen .boxing-ranking-header {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Rodapé sem bloco escuro */
+.boxing-screen .boxing-footer {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Texto continua legível sem precisar de um card atrás */
+.boxing-screen .boxing-champion,
+.boxing-screen .boxing-ranking-header,
+.boxing-screen .boxing-fighter,
+.boxing-screen .boxing-footer {
+  text-shadow:
+    0 2px 5px rgba(0,0,0,.95),
+    0 0 12px rgba(0,0,0,.75);
+}
+
+/* Ranking com mais posições e menos ocupação visual */
+.boxing-screen .boxing-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px 24px !important;
+}
+
+@media (max-width: 700px) {
+  .boxing-screen .boxing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px 18px !important;
+  }
+
+  .boxing-screen .boxing-fighter {
+    padding: 10px 6px !important;
+  }
+
+  .boxing-screen .boxing-fighter h3 {
+    font-size: 16px !important;
+  }
+
+  .boxing-screen .boxing-fighter small {
+    font-size: 9px !important;
+  }
+}
+
+
+/* =========================================================
+   NOCAUTE HOLOCAUSTO — LAYOUT SOBRE A IMAGEM
+   ========================================================= */
+
+/* A imagem passa a ser o elemento principal */
+.boxing-screen {
+  min-height: 100vh !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.04) 0%,
+      rgba(0,0,0,.03) 45%,
+      rgba(0,0,0,.16) 100%
+    ),
+    url("/nocaute-holocausto.jpg") center top / cover no-repeat !important;
+}
+
+/* ---------------------------------------------------------
+   CAMPEÃO — elimina o painel gigante
+   --------------------------------------------------------- */
+
+.boxing-screen .boxing-champion {
+  width: min(100%, 520px) !important;
+  margin: 0 auto !important;
+  padding: 8px 10px 14px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  overflow: visible !important;
+}
+
+/* Desliga qualquer brilho que esteja criando uma caixa */
+.boxing-screen .boxing-champion-glow {
+  display: none !important;
+}
+
+/* Foto/ícone do campeão muito menor */
+.boxing-screen .boxing-photo {
+  width: 82px !important;
+  height: 82px !important;
+  margin: 4px auto 8px !important;
+}
+
+/* Selo de campeão compacto */
+.boxing-screen .boxing-champion-label {
+  margin: 4px auto 4px !important;
+}
+
+.boxing-screen .boxing-champion-label span {
+  padding: 5px 12px !important;
+  font-size: 11px !important;
+  background: rgba(20,0,0,.38) !important;
+  border: 1px solid rgba(255,70,70,.55) !important;
+  border-radius: 999px !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Nome do campeão */
+.boxing-screen .boxing-champion h3 {
+  margin: 3px 0 !important;
+  font-size: clamp(28px, 7vw, 44px) !important;
+  line-height: 1 !important;
+  text-shadow:
+    0 3px 8px rgba(0,0,0,1),
+    0 0 16px rgba(0,0,0,.9) !important;
+}
+
+/* Subtítulo */
+.boxing-screen .boxing-champion-title {
+  margin: 4px 0 !important;
+  font-size: 12px !important;
+  text-shadow: 0 2px 7px rgba(0,0,0,1) !important;
+}
+
+/* Cinturão */
+.boxing-screen .boxing-belt {
+  display: inline-block !important;
+  margin: 5px auto !important;
+  padding: 5px 12px !important;
+
+  background: rgba(20,15,0,.38) !important;
+  border: 1px solid rgba(230,180,50,.65) !important;
+  border-radius: 999px !important;
+
+  font-size: 10px !important;
+
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* ---------------------------------------------------------
+   CABEÇALHO DO RANKING
+   --------------------------------------------------------- */
+
+.boxing-screen .boxing-ranking-header {
+  width: min(100%, 850px) !important;
+  margin: 4px auto 8px !important;
+  padding: 4px 8px !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  text-shadow:
+    0 2px 7px rgba(0,0,0,1),
+    0 0 12px rgba(0,0,0,.9) !important;
+}
+
+.boxing-screen .boxing-ranking-header strong {
+  font-size: 17px !important;
+}
+
+.boxing-screen .boxing-ranking-header small {
+  font-size: 10px !important;
+}
+
+/* ---------------------------------------------------------
+   15 POSIÇÕES — SEM CARDS
+   --------------------------------------------------------- */
+
+.boxing-screen .boxing-grid {
+  width: min(100%, 900px) !important;
+  margin: 0 auto !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 2px 18px !important;
+
+  background: transparent !important;
+}
+
+/* Cada posição vira apenas texto sobre a foto */
+.boxing-screen .boxing-fighter {
+  min-height: 62px !important;
+  padding: 7px 4px !important;
+
+  background: transparent !important;
+  background-image: none !important;
+
+  border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.20) !important;
+  border-radius: 0 !important;
+
+  box-shadow: none !important;
+
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  text-shadow:
+    0 2px 5px rgba(0,0,0,1),
+    0 0 10px rgba(0,0,0,.95) !important;
+}
+
+/* Número */
+.boxing-screen .boxing-fighter > strong {
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+
+/* Nome */
+.boxing-screen .boxing-fighter h3 {
+  margin: 4px 0 2px !important;
+  font-size: 14px !important;
+  line-height: 1.05 !important;
+}
+
+/* Texto secundário */
+.boxing-screen .boxing-fighter small {
+  font-size: 8px !important;
+  opacity: .85 !important;
+}
+
+/* Medalhas */
+.boxing-screen .boxing-medal {
+  font-size: 20px !important;
+  float: right !important;
+}
+
+/* Primeiro, segundo e terceiro recebem só um pequeno destaque */
+.boxing-screen .boxing-first,
+.boxing-screen .boxing-second,
+.boxing-screen .boxing-third {
+  background: rgba(0,0,0,.06) !important;
+}
+
+/* ---------------------------------------------------------
+   RODAPÉ
+   --------------------------------------------------------- */
+
+.boxing-screen .boxing-footer {
+  margin-top: 12px !important;
+  padding: 8px !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+
+  text-shadow:
+    0 2px 7px rgba(0,0,0,1),
+    0 0 12px rgba(0,0,0,.9) !important;
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+  .boxing-screen {
+    padding: 12px 10px 28px !important;
+    background-position: center top !important;
+  }
+
+  .boxing-screen .boxing-champion {
+    padding: 4px 5px 8px !important;
+  }
+
+  .boxing-screen .boxing-photo {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .boxing-screen .boxing-champion h3 {
+    font-size: 32px !important;
+  }
+
+  .boxing-screen .boxing-champion-title {
+    font-size: 10px !important;
+  }
+
+  .boxing-screen .boxing-belt {
+    font-size: 9px !important;
+  }
+
+  .boxing-screen .boxing-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0 8px !important;
+  }
+
+  .boxing-screen .boxing-fighter {
+    min-height: 58px !important;
+    padding: 6px 2px !important;
+  }
+
+  .boxing-screen .boxing-fighter > strong {
+    font-size: 17px !important;
+  }
+
+  .boxing-screen .boxing-fighter h3 {
+    font-size: 11px !important;
+  }
+
+  .boxing-screen .boxing-fighter small {
+    display: none !important;
+  }
+
+  .boxing-screen .boxing-medal {
+    font-size: 17px !important;
+  }
+
+}
+
+/* ---------------------------------------------------------
+   TELAS MUITO PEQUENAS
+   --------------------------------------------------------- */
+
+@media (max-width: 380px) {
+
+  .boxing-screen .boxing-grid {
+    gap: 0 5px !important;
+  }
+
+  .boxing-screen .boxing-fighter h3 {
+    font-size: 10px !important;
+  }
+
+  .boxing-screen .boxing-fighter > strong {
+    font-size: 15px !important;
+  }
+
+}
+
+
+/* ===== NOCAUTE NOVA ARTE — REMOVE FUNDO ANTIGO ===== */
+.boxing-screen {
+  background: none !important;
+  background-image: none !important;
+  padding: 18px 0 30px !important;
+}
+
+.boxing-screen > div:not(.boxing-back) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.boxing-screen > div:not(.boxing-back) img {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+}
+
+/* ===== CARD DECORATIVO DO EVENTO NOCAUTE ===== */
+
+/* ===== CARD DECORATIVO DO EVENTO NOCAUTE ===== */
+.nocaute-event-footer {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: calc(100% - 28px);
+  max-width: 560px;
+  box-sizing: border-box;
+  margin: 24px auto 18px;
+  padding: 20px 14px 15px;
+  overflow: hidden;
+  text-align: center;
+  border: 1px solid rgba(231, 55, 55, .8);
+  border-radius: 12px;
+  border-top: 3px solid #f04444;
+  border-bottom: 2px solid #a77932;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(180, 24, 24, .34), transparent 65%),
+    linear-gradient(145deg, rgba(30, 8, 8, .97), rgba(5, 5, 7, .98) 58%, rgba(38, 24, 8, .92));
+  box-shadow:
+    0 0 18px rgba(210, 25, 25, .19),
+    inset 0 0 22px rgba(170, 25, 25, .09),
+    0 7px 22px rgba(0, 0, 0, .32);
+  color: #f4eee7;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.nocaute-event-footer::before,
+.nocaute-event-footer::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(220, 65, 55, .16);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.nocaute-event-footer::before {
+  top: -68px;
+  left: -48px;
+}
+
+.nocaute-event-footer::after {
+  right: -48px;
+  bottom: -68px;
+  border-color: rgba(218, 174, 83, .19);
+}
+
+.nocaute-footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #e5bd68;
+  font-size: 9px;
+  letter-spacing: 3px;
+}
+
+.nocaute-footer-top span:first-child,
+.nocaute-footer-top span:last-child {
+  color: #f04444;
+  font-size: 12px;
+}
+
+.nocaute-footer-emblem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  height: 47px;
+  margin-top: 3px;
+  border: 1px solid rgba(230, 65, 55, .65);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(160, 20, 20, .3), rgba(0, 0, 0, .6));
+  box-shadow: 0 0 17px rgba(230, 30, 30, .16);
+  font-size: 25px;
+}
+
+.nocaute-footer-title {
+  display: block;
+  color: #fff5ed;
+  font-size: clamp(17px, 4.7vw, 25px);
+  line-height: 1.2;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .8);
+}
+
+.nocaute-footer-title span {
+  color: #ef4545;
+}
+
+.nocaute-footer-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  margin: 3px 0;
+  color: #e4bd70;
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+
+.nocaute-footer-divider i {
+  display: block;
+  width: clamp(20px, 9vw, 58px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #b52c2c);
+}
+
+.nocaute-footer-divider i:last-child {
+  background: linear-gradient(90deg, #b52c2c, transparent);
+}
+
+.nocaute-footer-slogan,
+.nocaute-footer-motto {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.nocaute-footer-slogan {
+  color: #fff;
+  font-size: clamp(12px, 3.5vw, 16px);
+  letter-spacing: 2px;
+}
+
+.nocaute-footer-motto {
+  color: #e5bd68;
+  font-size: clamp(9px, 2.7vw, 11px);
+  letter-spacing: 1px;
+}
+
+.nocaute-footer-motto span,
+.nocaute-footer-bottom span {
+  color: #ef4545;
+  padding: 0 3px;
+}
+
+.nocaute-footer-bottom {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(218, 174, 83, .22);
+  color: #b7aaa0;
+  font-size: 8px;
+  letter-spacing: 3px;
+}
+
+@media (max-width: 380px) {
+  .nocaute-event-footer {
+    width: calc(100% - 20px);
+    padding: 17px 9px 13px;
+  }
+
+  .nocaute-footer-title {
+    letter-spacing: .7px;
+  }
+
+  .nocaute-footer-motto {
+    letter-spacing: .4px;
+  }
+}
+
+
+
+/* DECORACAO INTERNA NOCAUTE - BORDA ORIGINAL PRESERVADA */
+.mainActions .actionSupplies {
+  position: relative !important;
+}
+
+.mainActions .actionSupplies::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(143, 184, 193, .2);
+  border-radius: 11px;
+  pointer-events: none;
+}
+
+.mainActions .actionSupplies::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 25%;
+  width: 50%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #8fb8c1, transparent);
+  opacity: .8;
+  pointer-events: none;
+}
+
+.mainActions .actionSupplies .visualCircle {
+  border: 1px solid rgba(143, 184, 193, .48);
+  box-shadow: 0 0 16px rgba(100, 190, 215, .12);
+}
+
+.mainActions .actionSupplies .visualLine {
+  background: linear-gradient(90deg, transparent, #8fb8c1, transparent);
+}
+
+.mainActions .actionSupplies .actionTitle {
+  color: #a9dce8;
+  text-shadow: 0 0 12px rgba(100, 190, 215, .2);
+}
+
+.mainActions .actionSupplies small {
+  color: #c2dce1;
+}
+

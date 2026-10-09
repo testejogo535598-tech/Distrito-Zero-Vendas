@@ -162,6 +162,44 @@ export default function Administracao() {
 
     const [gerenciandoPosicoes, setGerenciandoPosicoes] =
       useState(false);
+  const [nocauteCampeao,setNocauteCampeao]=useState("");
+  const [nocautePosicoes,setNocautePosicoes]=useState<string[]>(Array(15).fill(""));
+  const [carregandoNocaute,setCarregandoNocaute]=useState(true);
+  const [salvandoNocaute,setSalvandoNocaute]=useState(false);
+  const [mensagemNocaute,setMensagemNocaute]=useState("");
+
+  useEffect(()=>{
+    let ativo=true;
+    (async()=>{
+      const {data,error}=await supabase
+        .from("nocaute_ranking")
+        .select("posicao,gamertag")
+        .order("posicao",{ascending:true});
+
+      if(error){
+        console.error("Erro ao carregar ranking do Nocaute:",error);
+        if(ativo)setMensagemNocaute("Erro ao carregar: "+error.message);
+        if(ativo)setCarregandoNocaute(false);
+        return;
+      }
+
+      if(ativo && data){
+        const campeao=data.find((x:any)=>Number(x.posicao)===0);
+        setNocauteCampeao(campeao?.gamertag || "");
+        setNocautePosicoes(
+          Array.from({length:15},(_,i)=>{
+            const jogador=data.find((x:any)=>Number(x.posicao)===i+1);
+            return jogador?.gamertag || "";
+          })
+        );
+      }
+
+      if(ativo)setCarregandoNocaute(false);
+    })();
+
+    return ()=>{ativo=false;};
+  },[]);
+
 
     const [categoriaPosicoesSelecionada, setCategoriaPosicoesSelecionada] =
       useState<string | null>(null);
@@ -170,7 +208,51 @@ export default function Administracao() {
 
   const [pedidoAbertoId, setPedidoAbertoId] = useState<number | null>(null);
 
-  const totalPedidos = pedidos.length;
+
+  async function salvarRankingNocaute(){
+    setSalvandoNocaute(true);
+    setMensagemNocaute("");
+
+    try{
+      const registros=[
+        {
+          posicao:0,
+          gamertag:nocauteCampeao.trim(),
+          atualizado_em:new Date().toISOString()
+        },
+        ...nocautePosicoes.map((nome,index)=>({
+          posicao:index+1,
+          gamertag:nome.trim() || "LUGAR DISPONÍVEL",
+          atualizado_em:new Date().toISOString()
+        }))
+      ];
+
+      if(!nocauteCampeao.trim()){
+        setMensagemNocaute("Informe o nome do campeão.");
+        return;
+      }
+
+      const {error}=await supabase
+        .from("nocaute_ranking")
+        .upsert(registros,{onConflict:"posicao"});
+
+      if(error){
+        console.error("Erro ao salvar ranking do Nocaute:",error);
+        setMensagemNocaute("Erro ao salvar: "+error.message);
+        return;
+      }
+
+      setNocautePosicoes(prev=>prev.map(nome=>nome.trim() || "LUGAR DISPONÍVEL"));
+      setMensagemNocaute("Ranking do Nocaute salvo com sucesso!");
+    }catch(error){
+      console.error(error);
+      setMensagemNocaute("Ocorreu um erro inesperado ao salvar.");
+    }finally{
+      setSalvandoNocaute(false);
+    }
+  }
+
+const totalPedidos = pedidos.length;
 
   const pendentes = pedidos.filter(
     (pedido) => pedido.status !== "realizado"
@@ -2074,5 +2156,76 @@ Essa ação não poderá ser desfeita.`
 
       </section>
 
-    </main>  );
+
+      <section className="panel">
+        <h2>🥊 EDITAR RANKING DO NOCAUTE</h2>
+        <p style={{fontSize:"13px",opacity:0.8}}>
+          Altere o campeão e os nomes dos 15 lutadores. As alterações serão
+          exibidas no cartaz público do Nocaute Holocausto.
+        </p>
+
+        {carregandoNocaute ? (
+          <p>Carregando ranking...</p>
+        ) : (
+          <>
+            <label style={{display:"block",fontWeight:"bold",marginTop:"12px"}}>
+              🏆 CAMPEÃO
+            </label>
+            <input
+              type="text"
+              value={nocauteCampeao}
+              onChange={e=>setNocauteCampeao(e.target.value)}
+              placeholder="Gamertag do campeão"
+              maxLength={40}
+              style={{width:"100%",boxSizing:"border-box",padding:"12px",marginTop:"6px"}}
+            />
+
+            <h3 style={{marginTop:"20px"}}>CLASSIFICAÇÃO — 1º AO 15º</h3>
+            <div style={{
+              display:"grid",
+              gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",
+              gap:"10px"
+            }}>
+              {nocautePosicoes.map((nome,index)=>(
+                <label key={index} style={{display:"block",fontSize:"13px"}}>
+                  <strong>{index+1}º LUGAR</strong>
+                  <input
+                    type="text"
+                    value={nome}
+                    onChange={e=>setNocautePosicoes(prev=>prev.map(
+                      (valor,i)=>i===index ? e.target.value : valor
+                    ))}
+                    placeholder="Gamertag do lutador"
+                    maxLength={40}
+                    style={{width:"100%",boxSizing:"border-box",padding:"10px",marginTop:"5px"}}
+                  />
+                </label>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={salvarRankingNocaute}
+              disabled={salvandoNocaute}
+              style={{
+                width:"100%",
+                padding:"13px",
+                marginTop:"16px",
+                fontWeight:"bold",
+                cursor:salvandoNocaute ? "wait" : "pointer"
+              }}
+            >
+              {salvandoNocaute ? "SALVANDO..." : "💾 SALVAR RANKING DO NOCAUTE"}
+            </button>
+
+            {mensagemNocaute && (
+              <p role="status" style={{marginTop:"12px",overflowWrap:"anywhere"}}>
+                {mensagemNocaute}
+              </p>
+            )}
+          </>
+        )}
+      </section>
+
+</main>  );
 }

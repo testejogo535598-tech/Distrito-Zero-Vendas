@@ -28,9 +28,10 @@ const itensHtml = Array.isArray(pedido.items)
         Number(item.valor),
         item.tipo_valor === "real" ? "real" : "dzcoins"
       )}<br>
-                Subtotal: ${Number(
-                  item.valor * item.quantidade
-                ).toLocaleString("pt-BR")} DZ Coins
+                Subtotal: ${formatarValor(
+                  Number(item.valor) * Number(item.quantidade),
+                  item.tipo_valor === "real" ? "real" : "dzcoins"
+                )}
               </div>
             `
           )

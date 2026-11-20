@@ -52,7 +52,7 @@ export default function Home(){
  const [notice,setNotice]=useState("");
  const [pedidoLojaId,setPedidoLojaId]=useState<number|null>(null);
 
- const WHATSAPP_MERCADOR="5518996396879";
+ const WHATSAPP_MERCADOR="557991373822";
 
  useEffect(()=>{
   const idSalvo=localStorage.getItem("dz_jogador_id");
@@ -342,6 +342,29 @@ ${itensMensagem}
 Olá! Gostaria de combinar a entrega deste pedido.`;
 
    abrirWhatsAppPedido(mensagemWhatsApp, janelaWhatsApp);
+
+   fetch("/api/notificar-pedido-loja", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+     id: pedidoId,
+     gamertag: gamertag.trim(),
+     items: carrinho.map(item => ({
+      nome: item.nome,
+      quantidade: item.quantidade,
+      valor: item.valor,
+      tipo_valor: item.tipoValor
+     })),
+     total: totalCarrinho
+    })
+   }).then(async response => {
+    if (!response.ok) {
+     console.error("Erro ao enviar e-mail da Loja:", await response.text());
+    }
+   }).catch(error => {
+    console.error("Erro ao enviar e-mail da Loja:", error);
+   });
+
    setCarrinho([]);
    setCarrinhoAberto(false);
    setLojaAberta(false);
@@ -450,6 +473,21 @@ Gamertag: ${localOrder.gamertag}
 Olá! Gostaria de combinar a entrega deste pedido.`;
 
    abrirWhatsAppPedido(mensagemWhatsApp, janelaWhatsApp);
+
+   if (type === "venda") {
+    fetch("/api/notificar-pedido", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify(localOrder)
+    }).then(async response => {
+     if (!response.ok) {
+      console.error("Erro ao enviar e-mail da venda de ervas:", await response.text());
+     }
+    }).catch(error => {
+     console.error("Erro ao enviar e-mail da venda de ervas:", error);
+    });
+   }
+
    setNotice(`Pedido #${localOrder.id} enviado com sucesso.`);
    setMode("home");
  }
